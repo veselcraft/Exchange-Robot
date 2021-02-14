@@ -1,10 +1,13 @@
 # exchange-rates-tg-bot
 <b>Requirements:</b>
 <ul>
-  <li>Python 3.7+</li>
-  <li>Aiogram (2.11+), uvloop, ujson, cchardet, aiodns, aiohttp[speedups]</li>
-  <li>urllib3</li>
-  <li>xmltodict</li>
+  <li>Python 3.7+ (Recommended 3.8.5)</li>
+  <li>Aiogram (2.11+)</li>
+  <li>uvloop</li>
+  <li>ujson</li>
+  <li>cchardet</li>
+  <li>aiodns</li>
+  <li>aiohttp[speedups]</li>
 </ul>
 <b>ENGLISH VERSION:</b><br>
 ERTB – exchange rates telegram bot.<br>
@@ -19,7 +22,7 @@ Bot's answer:
 🇮🇱19.73 ILS
 🇺🇸6.06 USD</pre><br>
 <b>Bot run</b><br>
-You can run the bot like this: <pre>python3 bot.py</pre> By default, you will not see any output other than errors. To see the full output, run the bot like this: <pre>python3 bot.py -l on</pre> or <pre>python3 bot.py --logs on</pre><br>
+You can run the bot like this: <pre>python3 ERTB.py</pre> By default, you will not see any output other than errors. To see the full output, run the bot like this: <pre>python3 ERTB.py -l on</pre> or <pre>python3 ERTB.py --logs on</pre><br>
 <b>List of commands for users:</b><br>
 <dl>
   <dt>about</dt>
@@ -67,7 +70,7 @@ ERTB – exchange rates telegram bot.<br>
 🇷🇺365.98 RUB
 🇺🇦139.83 UAH</pre><br>
 <b>Запуск бота</b><br>
-Запустить бота можно так: <pre>python3 bot.py</pre> По умолчанию вы не увидите никакого вывода, кроме ошибок. Чтобы видеть полный вывод запустите бота так: <pre>python3 bot.py -l on</pre> или <pre>python3 bot.py --logs on</pre><br>
+Запустить бота можно так: <pre>python3 ERTB.py</pre> По умолчанию вы не увидите никакого вывода, кроме ошибок. Чтобы видеть полный вывод запустите бота так: <pre>python3 ERTB.py -l on</pre> или <pre>python3 ERTB.py --logs on</pre><br>
 <b>Список команд для пользователей:</b><br>
 <dl>
   <dt>about</dt>
