@@ -2,3 +2,5 @@ Token.py
 __pycaсhe__/
 *.pyc
 *.pyo
+DataBases/DataForBot.sqlite
+DataBases/ServiceData.sqlite
