@@ -288,4 +288,4 @@ def CreateDataBaseTemplate():
         """)
     
     con.close()
-    print("Main DB is created")
+    print("Main DB is created.")
