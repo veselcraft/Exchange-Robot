@@ -1,6 +1,7 @@
 import sqlite3 as sql
 import sys
 import os
+from typing import Set
 
 listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "SettingsExchangeRates", "sqlite_sequence"]
 listOfServiceTables = ["AdminsList", "BlackList", "sqlite_sequence"]
@@ -72,9 +73,9 @@ def CreateServiceDataBase():
         con.execute("""
             CREATE TABLE BlackList (
                 userID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                banDate TEXT,
-                chatID INTEGER,
-                chatName TEXT
+                banDate TEXT DEFAULT 0,
+                chatID INTEGER DEFAULT 0,
+                chatName TEXT DEFAULT 0
             );
         """)
 
@@ -91,18 +92,20 @@ def CreateDataBaseTemplate():
         con.execute("""
             CREATE TABLE SettingsGroups (
                 chatID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                deleteRules TEXT,
-                deleteButton BOOL,
-                editSettings TEXT,
-                flags BOOL
+                deleteRules TEXT DEFAULT admins,
+                deleteButton INTEGER DEFAULT 1,
+                editSettings TEXT DEFAULT admins,
+                flags INTEGER DEFAULT 1,
+                lang TEXT DEFAULT en
             );
         """)
     with con:
         con.execute("""
             CREATE TABLE SettingsPrivateChats (
                 chatID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                deleteButton BOOL,
-                flags BOOL
+                deleteButton INTEGER DEFAULT 1,
+                flags INTEGER DEFAULT 1,
+                lang TEXT DEFAULT en
             );
         """)
     with con:
@@ -117,175 +120,315 @@ def CreateDataBaseTemplate():
         con.execute("""
             CREATE TABLE SettingsExchangeRates (
                 chatID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                _AED BOOL,
-                _AFN BOOL,
-                _ALL BOOL,
-                _AMD BOOL,
-                _ANG BOOL,
-                _AOA BOOL,
-                _ARS BOOL,
-                _AUD BOOL,
-                _AWG BOOL,
-                _AZN BOOL,
-                _BAM BOOL,
-                _BBD BOOL,
-                _BDT BOOL,
-                _BGN BOOL,
-                _BHD BOOL,
-                _BIF BOOL,
-                _BMD BOOL,
-                _BND BOOL,
-                _BOB BOOL,
-                _BRL BOOL,
-                _BSD BOOL,
-                _BTN BOOL,
-                _BWP BOOL,
-                _BYN BOOL,
-                _BYR BOOL,
-                _BZD BOOL,
-                _CAD BOOL,
-                _CDF BOOL,
-                _CHF BOOL,
-                _CLF BOOL,
-                _CLP BOOL,
-                _CNY BOOL,
-                _COP BOOL,
-                _CRC BOOL,
-                _CUC BOOL,
-                _CUP BOOL,
-                _CVE BOOL,
-                _CZK BOOL,
-                _DJF BOOL,
-                _DKK BOOL,
-                _DOP BOOL,
-                _DZD BOOL,
-                _EGP BOOL,
-                _ERN BOOL,
-                _ETB BOOL,
-                _EUR BOOL,
-                _FJD BOOL,
-                _FKP BOOL,
-                _GBP BOOL,
-                _GEL BOOL,
-                _GGP BOOL,
-                _GHS BOOL,
-                _GIP BOOL,
-                _GMD BOOL,
-                _GNF BOOL,
-                _GTQ BOOL,
-                _GYD BOOL,
-                _HKD BOOL,
-                _HNL BOOL,
-                _HRK BOOL,
-                _HTG BOOL,
-                _HUF BOOL,
-                _IDR BOOL,
-                _ILS BOOL,
-                _IMP BOOL,
-                _INR BOOL,
-                _IQD BOOL,
-                _IRR BOOL,
-                _ISK BOOL,
-                _JEP BOOL,
-                _JMD BOOL,
-                _JOD BOOL,
-                _JPY BOOL,
-                _KES BOOL,
-                _KGS BOOL,
-                _KHR BOOL,
-                _KMF BOOL,
-                _KPW BOOL,
-                _KRW BOOL,
-                _KWD BOOL,
-                _KYD BOOL,
-                _KZT BOOL,
-                _LAK BOOL,
-                _LBP BOOL,
-                _LKR BOOL,
-                _LRD BOOL,
-                _LSL BOOL,
-                _LTL BOOL,
-                _LVL BOOL,
-                _LYD BOOL,
-                _MAD BOOL,
-                _MDL BOOL,
-                _MGA BOOL,
-                _MKD BOOL,
-                _MMK BOOL,
-                _MNT BOOL,
-                _MOP BOOL,
-                _MRO BOOL,
-                _MUR BOOL,
-                _MVR BOOL,
-                _MWK BOOL,
-                _MXN BOOL,
-                _MYR BOOL,
-                _MZN BOOL,
-                _NAD BOOL,
-                _NGN BOOL,
-                _NIO BOOL,
-                _NOK BOOL,
-                _NPR BOOL,
-                _NZD BOOL,
-                _OMR BOOL,
-                _PAB BOOL,
-                _PEN BOOL,
-                _PGK BOOL,
-                _PHP BOOL,
-                _PKR BOOL,
-                _PLN BOOL,
-                _PYG BOOL,
-                _QAR BOOL,
-                _RON BOOL,
-                _RSD BOOL,
-                _RUB BOOL,
-                _RWF BOOL,
-                _SAR BOOL,
-                _SBD BOOL,
-                _SCR BOOL,
-                _SDG BOOL,
-                _SEK BOOL,
-                _SGD BOOL,
-                _SHP BOOL,
-                _SLL BOOL,
-                _SOS BOOL,
-                _SRD BOOL,
-                _STD BOOL,
-                _SVC BOOL,
-                _SYP BOOL,
-                _SZL BOOL,
-                _THB BOOL,
-                _TJS BOOL,
-                _TMT BOOL,
-                _TND BOOL,
-                _TOP BOOL,
-                _TRY BOOL,
-                _TTD BOOL,
-                _TWD BOOL,
-                _TZS BOOL,
-                _UAH BOOL,
-                _UGX BOOL,
-                _USD BOOL,
-                _UYU BOOL,
-                _UZS BOOL,
-                _VEF BOOL,
-                _VND BOOL,
-                _VUV BOOL,
-                _WST BOOL,
-                _XAF BOOL,
-                _XAG BOOL,
-                _XAU BOOL,
-                _XCD BOOL,
-                _XDR BOOL,
-                _XOF BOOL,
-                _XPF BOOL,
-                _YER BOOL,
-                _ZAR BOOL,
-                _ZMK BOOL,
-                _ZMW BOOL,
-                _ZWL BOOL
+                _AED INTEGER DEFAULT 0,
+                _AFN INTEGER DEFAULT 0,
+                _ALL INTEGER DEFAULT 0,
+                _AMD INTEGER DEFAULT 0,
+                _ANG INTEGER DEFAULT 0,
+                _AOA INTEGER DEFAULT 0,
+                _ARS INTEGER DEFAULT 0,
+                _AUD INTEGER DEFAULT 0,
+                _AWG INTEGER DEFAULT 0,
+                _AZN INTEGER DEFAULT 0,
+                _BAM INTEGER DEFAULT 0,
+                _BBD INTEGER DEFAULT 0,
+                _BDT INTEGER DEFAULT 0,
+                _BGN INTEGER DEFAULT 0,
+                _BHD INTEGER DEFAULT 0,
+                _BIF INTEGER DEFAULT 0,
+                _BMD INTEGER DEFAULT 0,
+                _BND INTEGER DEFAULT 0,
+                _BOB INTEGER DEFAULT 0,
+                _BRL INTEGER DEFAULT 0,
+                _BSD INTEGER DEFAULT 0,
+                _BTN INTEGER DEFAULT 0,
+                _BWP INTEGER DEFAULT 0,
+                _BYN INTEGER DEFAULT 0,
+                _BZD INTEGER DEFAULT 0,
+                _CAD INTEGER DEFAULT 0,
+                _CDF INTEGER DEFAULT 0,
+                _CHF INTEGER DEFAULT 0,
+                _CLF INTEGER DEFAULT 0,
+                _CLP INTEGER DEFAULT 0,
+                _CNY INTEGER DEFAULT 0,
+                _COP INTEGER DEFAULT 0,
+                _CRC INTEGER DEFAULT 0,
+                _CUC INTEGER DEFAULT 0,
+                _CUP INTEGER DEFAULT 0,
+                _CVE INTEGER DEFAULT 0,
+                _CZK INTEGER DEFAULT 0,
+                _DJF INTEGER DEFAULT 0,
+                _DKK INTEGER DEFAULT 0,
+                _DOP INTEGER DEFAULT 0,
+                _DZD INTEGER DEFAULT 0,
+                _EGP INTEGER DEFAULT 0,
+                _ERN INTEGER DEFAULT 0,
+                _ETB INTEGER DEFAULT 0,
+                _EUR INTEGER DEFAULT 0,
+                _FJD INTEGER DEFAULT 0,
+                _FKP INTEGER DEFAULT 0,
+                _GBP INTEGER DEFAULT 0,
+                _GEL INTEGER DEFAULT 0,
+                _GGP INTEGER DEFAULT 0,
+                _GHS INTEGER DEFAULT 0,
+                _GIP INTEGER DEFAULT 0,
+                _GMD INTEGER DEFAULT 0,
+                _GNF INTEGER DEFAULT 0,
+                _GTQ INTEGER DEFAULT 0,
+                _GYD INTEGER DEFAULT 0,
+                _HKD INTEGER DEFAULT 0,
+                _HNL INTEGER DEFAULT 0,
+                _HRK INTEGER DEFAULT 0,
+                _HTG INTEGER DEFAULT 0,
+                _HUF INTEGER DEFAULT 0,
+                _IDR INTEGER DEFAULT 0,
+                _ILS INTEGER DEFAULT 0,
+                _IMP INTEGER DEFAULT 0,
+                _INR INTEGER DEFAULT 0,
+                _IQD INTEGER DEFAULT 0,
+                _IRR INTEGER DEFAULT 0,
+                _ISK INTEGER DEFAULT 0,
+                _JEP INTEGER DEFAULT 0,
+                _JMD INTEGER DEFAULT 0,
+                _JOD INTEGER DEFAULT 0,
+                _JPY INTEGER DEFAULT 0,
+                _KES INTEGER DEFAULT 0,
+                _KGS INTEGER DEFAULT 0,
+                _KHR INTEGER DEFAULT 0,
+                _KMF INTEGER DEFAULT 0,
+                _KPW INTEGER DEFAULT 0,
+                _KRW INTEGER DEFAULT 0,
+                _KWD INTEGER DEFAULT 0,
+                _KYD INTEGER DEFAULT 0,
+                _KZT INTEGER DEFAULT 0,
+                _LAK INTEGER DEFAULT 0,
+                _LBP INTEGER DEFAULT 0,
+                _LKR INTEGER DEFAULT 0,
+                _LRD INTEGER DEFAULT 0,
+                _LSL INTEGER DEFAULT 0,
+                _LTL INTEGER DEFAULT 0,
+                _LVL INTEGER DEFAULT 0,
+                _LYD INTEGER DEFAULT 0,
+                _MAD INTEGER DEFAULT 0,
+                _MDL INTEGER DEFAULT 0,
+                _MGA INTEGER DEFAULT 0,
+                _MKD INTEGER DEFAULT 0,
+                _MMK INTEGER DEFAULT 0,
+                _MNT INTEGER DEFAULT 0,
+                _MOP INTEGER DEFAULT 0,
+                _MRO INTEGER DEFAULT 0,
+                _MUR INTEGER DEFAULT 0,
+                _MVR INTEGER DEFAULT 0,
+                _MWK INTEGER DEFAULT 0,
+                _MXN INTEGER DEFAULT 0,
+                _MYR INTEGER DEFAULT 0,
+                _MZN INTEGER DEFAULT 0,
+                _NAD INTEGER DEFAULT 0,
+                _NGN INTEGER DEFAULT 0,
+                _NIO INTEGER DEFAULT 0,
+                _NOK INTEGER DEFAULT 0,
+                _NPR INTEGER DEFAULT 0,
+                _NZD INTEGER DEFAULT 0,
+                _OMR INTEGER DEFAULT 0,
+                _PAB INTEGER DEFAULT 0,
+                _PEN INTEGER DEFAULT 0,
+                _PGK INTEGER DEFAULT 0,
+                _PHP INTEGER DEFAULT 0,
+                _PKR INTEGER DEFAULT 0,
+                _PLN INTEGER DEFAULT 0,
+                _PYG INTEGER DEFAULT 0,
+                _QAR INTEGER DEFAULT 0,
+                _RON INTEGER DEFAULT 0,
+                _RSD INTEGER DEFAULT 0,
+                _RUB INTEGER DEFAULT 0,
+                _RWF INTEGER DEFAULT 0,
+                _SAR INTEGER DEFAULT 0,
+                _SBD INTEGER DEFAULT 0,
+                _SCR INTEGER DEFAULT 0,
+                _SDG INTEGER DEFAULT 0,
+                _SEK INTEGER DEFAULT 0,
+                _SGD INTEGER DEFAULT 0,
+                _SHP INTEGER DEFAULT 0,
+                _SLL INTEGER DEFAULT 0,
+                _SOS INTEGER DEFAULT 0,
+                _SRD INTEGER DEFAULT 0,
+                _STD INTEGER DEFAULT 0,
+                _SVC INTEGER DEFAULT 0,
+                _SYP INTEGER DEFAULT 0,
+                _SZL INTEGER DEFAULT 0,
+                _THB INTEGER DEFAULT 0,
+                _TJS INTEGER DEFAULT 0,
+                _TMT INTEGER DEFAULT 0,
+                _TND INTEGER DEFAULT 0,
+                _TOP INTEGER DEFAULT 0,
+                _TRY INTEGER DEFAULT 0,
+                _TTD INTEGER DEFAULT 0,
+                _TWD INTEGER DEFAULT 0,
+                _TZS INTEGER DEFAULT 0,
+                _UAH INTEGER DEFAULT 0,
+                _UGX INTEGER DEFAULT 0,
+                _USD INTEGER DEFAULT 0,
+                _UYU INTEGER DEFAULT 0,
+                _UZS INTEGER DEFAULT 0,
+                _VEF INTEGER DEFAULT 0,
+                _VND INTEGER DEFAULT 0,
+                _VUV INTEGER DEFAULT 0,
+                _WST INTEGER DEFAULT 0,
+                _XAF INTEGER DEFAULT 0,
+                _XAG INTEGER DEFAULT 0,
+                _XAU INTEGER DEFAULT 0,
+                _XCD INTEGER DEFAULT 0,
+                _XDR INTEGER DEFAULT 0,
+                _XOF INTEGER DEFAULT 0,
+                _XPF INTEGER DEFAULT 0,
+                _YER INTEGER DEFAULT 0,
+                _ZAR INTEGER DEFAULT 0,
+                _ZMK INTEGER DEFAULT 0,
+                _ZMW INTEGER DEFAULT 0,
+                _ZWL INTEGER DEFAULT 0
             );
         """)
     
     con.close()
     print("Main DB is created.")
+
+def AddID(chatID):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    cursor.execute("INSERT OR IGNORE INTO SettingsExchangeRates (chatID) values (?)",tuple([chatID]))
+    if(chatID<0):
+        cursor.execute("INSERT OR IGNORE INTO SettingsGroups (chatID) values (?)",tuple([chatID]))
+    else:
+        cursor.execute("INSERT OR IGNORE INTO SettingsPrivateChats (chatID) values (?)",tuple([chatID]))
+    con.commit()
+
+def SetSetting(chatID, key, val):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    try:
+        if chatID<0:
+            cursor.execute("UPDATE OR ABORT SettingsGroups SET "+str(key)+"= "+str(val)+" WHERE chatID = "+str(chatID))
+        else:
+            cursor.execute("UPDATE OR ABORT SettingsPrivateChats SET "+str(key)+"= "+str(val)+" WHERE chatID = "+str(chatID))
+        con.commit()
+    except:
+        print("No such column")
+
+def GetAllSettings(chatID):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    con.row_factory = sql.Row
+    cursor = con.cursor()
+    try:
+        if chatID<0:
+            cursor.execute("SELECT * from SettingsGroups WHERE chatID = "+str(chatID))
+            res = cursor.fetchone()
+        else:
+            cursor.execute("SELECT * from SettingsPrivateChats WHERE chatID = "+str(chatID))
+            res = cursor.fetchone()
+        return dict(res)
+    except:
+        print("No such chatID")
+        return None
+
+def GetSetting(chatID,key):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    try:
+        if chatID<0:
+            cursor.execute("SELECT "+str(key)+" from SettingsGroups WHERE chatID = "+str(chatID))
+            res = cursor.fetchone()
+        else:
+            cursor.execute("SELECT "+str(key)+" from SettingsPrivateChats WHERE chatID = "+str(chatID))
+            res = cursor.fetchone()
+        return res[0]
+    except:
+        print("No such column")
+        return None
+def GetAllCurrencies(chatID):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    con.row_factory = sql.Row
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT * FROM SettingsExchangeRates WHERE chatID = "+str(chatID))
+        res = dict(cursor.fetchone())
+        return [k[1:] for k,v in res.items() if v==1]
+    except:
+        print("No such chatID")
+        return None
+
+def ChatExists(chatID):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM SettingsExchangeRates WHERE chatID = "+str(chatID)+")")
+    res = cursor.fetchone()
+    return res[0]
+
+def IsBlacklisted(userID):
+    userID = int(userID)
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM BlackList WHERE userID = "+str(userID)+")")
+    res = cursor.fetchone()
+    return res[0]
+
+def ClearBlacklist(userID):
+    userID = int(userID)
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    if userID==0:
+        cursor.execute("DELETE FROM BlackList")
+        con.commit()
+        return 1
+    else:
+        try:
+            cursor.execute("DELETE FROM BlackList WHERE userID = "+str(userID))
+            con.commit()
+            return 1
+        except:
+            print("No such userID")
+            return None
+
+        
+def AddBlacklist(userID,chatID=0,chatName=""):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("INSERT OR IGNORE INTO BlackList (userID,chatID,chatName,banDate) values (?,?,?,DATE())",tuple([userID,chatID,chatName]))
+    con.commit()
+
+def GetAdmins():
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT * from AdminsList")
+    res = cursor.fetchall()
+    return [k[0] for k in res]
+
+def AddAdmin(adminID):
+    adminID = int(adminID)
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("INSERT OR IGNORE INTO AdminsList (adminID) values ("+str(adminID)+")")
+    con.commit()
+
+def ClearAdmins(adminID):
+    adminID = int(adminID)
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    if adminID==0:
+        cursor.execute("DELETE FROM AdminsList")
+        con.commit()
+        return 1
+    else:
+        try:
+            cursor.execute("DELETE FROM AdminsList WHERE adminID = "+str(adminID))
+            con.commit()
+            return 1
+        except:
+            print("No such adminID")
+            return None
