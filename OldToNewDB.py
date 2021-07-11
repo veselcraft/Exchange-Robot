@@ -3,15 +3,16 @@ import os
 import ast
 from DBH import DbIntegrityCheck
 
+
 DbIntegrityCheck()
 if os.path.exists("DataBases/DataForBot.sqlite") and os.path.exists("settings"):
         #Connect to DB
         con = sql.connect('DataBases/DataForBot.sqlite')
         cursor = con.cursor()
         print("Connected to main DB successfully.")
-        query = "INSERT into SettingsExchangeRates (chatID, _AZN,_BYN,_CHF,_CNY,_CZK,_EUR,_GBP,_GEL,_ILS,_INR,_KRW,_KZT,_RUB,_PLN,_UAH,_USD,_UZS) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-        query_private = "INSERT into SettingsPrivateChats (chatID, deleteButton) values (?,?)"
-        query_groups = "INSERT into SettingsGroups (chatID, deleteRules, deleteButton, editSettings) values (?,?,?,?)"
+        query = "INSERT OR REPLACE into SettingsExchangeRates (chatID, _AZN,_BYN,_CHF,_CNY,_CZK,_EUR,_GBP,_GEL,_ILS,_INR,_KRW,_KZT,_RUB,_PLN,_UAH,_USD,_UZS) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+        query_private = "INSERT OR REPLACE into SettingsPrivateChats (chatID, deleteButton) values (?,?)"
+        query_groups = "INSERT OR REPLACE into SettingsGroups (chatID, deleteRules, deleteButton, editSettings) values (?,?,?,?)"
         for filename in os.listdir("settings"):
             with open("settings/"+filename) as f:
                 data = f.read()
@@ -37,7 +38,7 @@ if os.path.exists("DataBases/DataForBot.sqlite") and os.path.exists("settings"):
                 data = f.read().splitlines()
                 data = [tuple([k]) for k in data]
                 print(data)
-            cursor.executemany("INSERT INTO BlackList (userID,banDate) values (?,DATE())",data)
+            cursor.executemany("INSERT OR REPLACE INTO BlackList (userID,banDate) values (?,DATE())",data)
             con.commit()
             print("Blacklist was succesfuly transfered")
         else:
