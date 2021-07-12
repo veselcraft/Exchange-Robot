@@ -11,7 +11,7 @@ import sys
 import w2n
 
 # Own libraries
-from DBH import DbIntegrityCheck
+import DBH
 from NewPrint import Print, EnableLogging, DisableLogging
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, UpdateExchangeRates
@@ -89,8 +89,11 @@ async def UnbanVoid(message: types.Message):
 async def StartVoid(message: types.Message):
     pass
 
+
 @dp.message_handler(content_types=ContentType.ANY)
 async def MainVoid(message: types.Message):
+    # Checking if a user is on the blacklist
+    
 
     # Get message text
     MessageText = message.text
@@ -98,16 +101,16 @@ async def MainVoid(message: types.Message):
         MessageText = message.caption
     if MessageText is None or MessageText == "":
         return
-        
+
     # Logging basic information to terminal
     LogMainInfo(message, MessageText)
-    
-    #тут проверка чата, есть ли он в БД и надо ли создавать под него настройки
+
+    # тут проверка чата, есть ли он в БД и надо ли создавать под него настройки
 
     # Check digit
     if not any(map(str.isdigit, MessageText)):
         return
-    
+
     MessageText = MessageText.lower()
 
     # проверка на пасхалки
@@ -121,11 +124,6 @@ async def MainVoid(message: types.Message):
 
     Print(TextArray)
 
-
-
-    
-
-    
 
 def CheckArgument(key, value):
     isAllOkArg = True
