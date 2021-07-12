@@ -439,3 +439,11 @@ def ClearAdmins(adminID):
         except:
             print("No such adminID")
             return None
+
+def GetListOfCurrencies():
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    con.row_factory = sql.Row
+    cursor = con.cursor()
+    cursor.execute("SELECT * FROM SettingsExchangeRates")
+    res = dict(cursor.fetchone())
+    return [k[1:] for k,v in res.items() if v==1 or v==0]
