@@ -1,4 +1,4 @@
-shouldItBeUpdated = True
+shouldItBeUpdated = False
 
 def IsUpdate():
     return not shouldItBeUpdated
