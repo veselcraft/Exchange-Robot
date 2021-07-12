@@ -19,7 +19,6 @@ bnd
 bob
 brl
 bsd
-btc
 btn
 bwp
 byn,бр

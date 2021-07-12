@@ -1,5 +1,4 @@
 # Token
-from typing import Text
 from Token import botToken
 
 # Public libraries
@@ -8,15 +7,14 @@ from aiogram.types.message import ContentType
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from threading import Thread
 import sys
-import w2n
 
 # Own libraries
 import DBH
-from NewPrint import Print, EnableLogging, DisableLogging
+from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, UpdateExchangeRates
-from LogOut import LogMainInfo
-from Processing import SpecialSplit, TextToDigit
+from BlackList import IsUserInBlackList, LoadBlackList
+from Processing import LoadCurrencies, LoadDictionaries, SearchValuesAndCurrencies, SpecialSplit, TextToDigit, GetCur
 
 # Main variables
 bot = Bot(token=botToken)
@@ -93,7 +91,8 @@ async def StartVoid(message: types.Message):
 @dp.message_handler(content_types=ContentType.ANY)
 async def MainVoid(message: types.Message):
     # Checking if a user is on the blacklist
-    
+    if IsUserInBlackList(message.from_user.id):
+        return
 
     # Get message text
     MessageText = message.text
@@ -103,26 +102,38 @@ async def MainVoid(message: types.Message):
         return
 
     # Logging basic information to terminal
-    LogMainInfo(message, MessageText)
+    PrintMainInfo(message, MessageText)
 
-    # тут проверка чата, есть ли он в БД и надо ли создавать под него настройки
+    # Checking the chat in the database
+    """ if DBH.ChatExists(message.chat.id):
+        pass
+    else:
+        DBH.AddID(message.chat.id, message.chat.type) """
 
     # Check digit
     if not any(map(str.isdigit, MessageText)):
         return
 
     MessageText = MessageText.lower()
-
-    # проверка на пасхалки
-
-    MessageText = w2n.word_to_num(MessageText)
     TextArray = SpecialSplit(MessageText)
+    Print(TextArray)
+
 
     # поиск валют, если их нет, то возврат обратно, если есть, то продолжить
 
     TextArray = TextToDigit(TextArray)
-
     Print(TextArray)
+
+    NumArray = SearchValuesAndCurrencies(TextArray)
+    Print(NumArray)
+
+    textMes = ''
+    for i in range(len(NumArray[0])):
+        NumArray[1][i] = GetCur(NumArray[1][i])
+        textMes += NumArray[0][i] + " " + NumArray[1][i] + "\n"
+
+
+    await message.reply(textMes)
 
 
 def CheckArgument(key, value):
@@ -150,6 +161,11 @@ def CheckArgument(key, value):
         print("Error. Unknow argument '{}'".format(key))
     return isAllOkArg
 
+def LoadDataForBot():
+    DBH.DbIntegrityCheck()
+    LoadBlackList()
+    LoadCurrencies()
+    LoadDictionaries()
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
@@ -173,5 +189,5 @@ if __name__ == '__main__':
 
     # ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)
     # ThreadUpdateExchangeRates.start()
-    """ DbIntegrityCheck() """
+    LoadDataForBot()
     executor.start_polling(dp, skip_updates=IsUpdate())

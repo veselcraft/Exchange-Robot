@@ -348,6 +348,7 @@ def GetSetting(chatID,key,chatType):
     except:
         print("No such column")
         return None
+
 def GetAllCurrencies(chatID):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
@@ -360,6 +361,15 @@ def GetAllCurrencies(chatID):
     except:
         print("No such chatID")
         return None
+
+def GetListOfCurrencies():
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    con.row_factory = sql.Row
+    cursor = con.execute("select * from SettingsExchangeRates")
+    row = cursor.fetchone()
+    names = row.keys()
+    names.pop(0)
+    return names
 
 def ChatExists(chatID):
     chatID = int(chatID)
