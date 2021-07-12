@@ -141,7 +141,6 @@ def CreateDataBaseTemplate():
                 _BTN BOOL,
                 _BWP BOOL,
                 _BYN BOOL,
-                _BYR BOOL,
                 _BZD BOOL,
                 _CAD BOOL,
                 _CDF BOOL,

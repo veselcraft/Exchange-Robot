@@ -1,4 +1,4 @@
-consoleLog = False
+consoleLog = True
 
 def Print(printingText):
     if consoleLog:

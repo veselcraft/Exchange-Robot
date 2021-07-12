@@ -1,77 +1,131 @@
-#Token
+# Token
+from typing import Text
 from Token import botToken
 
-#Public libraries
+# Public libraries
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.message import ContentType
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from threading import Thread
 import sys
+import w2n
 
-#Own libraries
+# Own libraries
 from DBH import DbIntegrityCheck
 from NewPrint import Print, EnableLogging, DisableLogging
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, UpdateExchangeRates
+from LogOut import LogMainInfo
+from Processing import SpecialSplit, TextToDigit
 
-#Main variables
-bot = Bot(token = botToken)
+# Main variables
+bot = Bot(token=botToken)
 dp = Dispatcher(bot)
 
-#Public commands
-@dp.message_handler(commands=['about'])
-async def main_void(message: types.Message):
+# Public commands
+
+
+@dp.message_handler(commands=['about'])  # analog about and source
+async def AboutMes(message: types.Message):
     pass
+
 
 @dp.message_handler(commands=['help'])
-async def main_void(message: types.Message):
+async def HelpMes(message: types.Message):
     pass
+
 
 @dp.message_handler(commands=['settings'])
-async def main_void(message: types.Message):
+async def SettingsMes(message: types.Message):
     pass
+
 
 @dp.message_handler(commands=['donate'])
-async def main_void(message: types.Message):
+async def DonateMes(message: types.Message):
     pass
+
 
 @dp.message_handler(commands=['wrong'])
-async def main_void(message: types.Message):
+async def WrongMes(message: types.Message):
     pass
 
-@dp.message_handler(commands=['source'])
-async def main_void(message: types.Message):
-    pass
+# Admin`s commands
 
-#Admin`s commands
+
 @dp.message_handler(commands=['echo'])
-async def main_void(message: types.Message):
+async def EchoVoid(message: types.Message):
     pass
 
-@dp.message_handler(commands=['numberofusers']) #Analog of "count".
-async def main_void(message: types.Message):
+
+@dp.message_handler(commands=['numberofusers'])  # Analog of "count".
+async def CountVoid(message: types.Message):
     pass
+
 
 @dp.message_handler(commands=['newadmin'])
-async def main_void(message: types.Message):
+async def AddAdminVoid(message: types.Message):
     pass
+
 
 @dp.message_handler(commands=['stats'])
-async def main_void(message: types.Message):
+async def StatsVoid(message: types.Message):
     pass
 
-@dp.message_handler(commands=['pulloutalldata']) #analog "backup", "logs" and "reports".
-async def main_void(message: types.Message):
+
+# analog "backup", "logs" and "reports".
+@dp.message_handler(commands=['pulloutalldata'])
+async def BackupVoid(message: types.Message):
     pass
+
 
 @dp.message_handler(commands=['unban'])
-async def main_void(message: types.Message):
+async def UnbanVoid(message: types.Message):
     pass
 
-#Technical commands
+# Technical commands
+
+
 @dp.message_handler(commands=['start'])
-async def main_void(message: types.Message):
+async def StartVoid(message: types.Message):
     pass
+
+@dp.message_handler(content_types=ContentType.ANY)
+async def MainVoid(message: types.Message):
+
+    # Get message text
+    MessageText = message.text
+    if message.photo or message.video is not None or message.document is not None:
+        MessageText = message.caption
+    if MessageText is None or MessageText == "":
+        return
+        
+    # Logging basic information to terminal
+    LogMainInfo(message, MessageText)
+    
+    #тут проверка чата, есть ли он в БД и надо ли создавать под него настройки
+
+    # Check digit
+    if not any(map(str.isdigit, MessageText)):
+        return
+    
+    MessageText = MessageText.lower()
+
+    # проверка на пасхалки
+
+    MessageText = w2n.word_to_num(MessageText)
+    TextArray = SpecialSplit(MessageText)
+
+    # поиск валют, если их нет, то возврат обратно, если есть, то продолжить
+
+    TextArray = TextToDigit(TextArray)
+
+    Print(TextArray)
+
+
+
+    
+
+    
 
 def CheckArgument(key, value):
     isAllOkArg = True
@@ -95,8 +149,9 @@ def CheckArgument(key, value):
         else:
             isAllOkArg = False
     else:
-        print ("Error. Unknow argument '{}'".format(key))
+        print("Error. Unknow argument '{}'".format(key))
     return isAllOkArg
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
@@ -118,7 +173,7 @@ if __name__ == '__main__':
         print("Error. Duplicate argument.")
         sys.exit()
 
-    #ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)
-    #ThreadUpdateExchangeRates.start()
-    DbIntegrityCheck()
+    # ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)
+    # ThreadUpdateExchangeRates.start()
+    """ DbIntegrityCheck() """
     executor.start_polling(dp, skip_updates=IsUpdate())
