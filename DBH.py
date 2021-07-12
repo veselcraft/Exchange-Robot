@@ -333,12 +333,12 @@ def GetAllSettings(chatID, chatType):
         print("No such chatID")
         return None
 
-def GetSetting(chatID,key):
+def GetSetting(chatID,key,chatType):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     try:
-        if chatID<0:
+        if chatType=="group" or chatType=="supergroup":
             cursor.execute("SELECT "+str(key)+" from SettingsGroups WHERE chatID = "+str(chatID))
             res = cursor.fetchone()
         else:
