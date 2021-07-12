@@ -292,23 +292,23 @@ def CreateDataBaseTemplate():
     con.close()
     print("Main DB is created.")
 
-def AddID(chatID):
+def AddID(chatID, chatType):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     cursor.execute("INSERT OR IGNORE INTO SettingsExchangeRates (chatID) values (?)",tuple([chatID]))
-    if(chatID<0):
+    if chatType=="group" or chatType=="supergroup":
         cursor.execute("INSERT OR IGNORE INTO SettingsGroups (chatID) values (?)",tuple([chatID]))
     else:
         cursor.execute("INSERT OR IGNORE INTO SettingsPrivateChats (chatID) values (?)",tuple([chatID]))
     con.commit()
 
-def SetSetting(chatID, key, val):
+def SetSetting(chatID, key, val, chatType):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     try:
-        if chatID<0:
+        if chatType=="group" or chatType=="supergroup":
             cursor.execute("UPDATE OR ABORT SettingsGroups SET "+str(key)+"= "+str(val)+" WHERE chatID = "+str(chatID))
         else:
             cursor.execute("UPDATE OR ABORT SettingsPrivateChats SET "+str(key)+"= "+str(val)+" WHERE chatID = "+str(chatID))
@@ -316,13 +316,13 @@ def SetSetting(chatID, key, val):
     except:
         print("No such column")
 
-def GetAllSettings(chatID):
+def GetAllSettings(chatID, chatType):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     con.row_factory = sql.Row
     cursor = con.cursor()
     try:
-        if chatID<0:
+        if chatType=="group" or chatType=="supergroup":
             cursor.execute("SELECT * from SettingsGroups WHERE chatID = "+str(chatID))
             res = cursor.fetchone()
         else:
@@ -401,6 +401,13 @@ def AddBlacklist(userID,chatID=0,chatName=""):
     cursor = con.cursor()
     cursor.execute("INSERT OR IGNORE INTO BlackList (userID,chatID,chatName,banDate) values (?,?,?,DATE())",tuple([userID,chatID,chatName]))
     con.commit()
+
+def GetBlacklist():
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT * from BlackList")
+    res = cursor.fetchall()
+    return [k[0] for k in res]
 
 def GetAdmins():
     con = sql.connect('DataBases/ServiceData.sqlite')

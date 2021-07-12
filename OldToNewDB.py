@@ -22,7 +22,7 @@ if os.path.exists("DataBases/DataForBot.sqlite") and os.path.exists("settings"):
             d.setdefault("delete_button",0)
             row = (filename[:-5],d.get("AZN"),d.get("BYN"),d.get("CHF"),d.get("CNY"),d.get("CZK"),d.get("EUR"),d.get("GBP"),d.get("GEL"),d.get("ILS"),d.get("INR"),d.get("KRW"),d.get("KZT"),d.get("RUB"),d.get("PLN"),d.get("UAH"),d.get("USD"),d.get("UZS"))
             cursor.execute(query,row)
-            if(filename[0]=="-"):
+            if(d.get("edit") is not None):
                 row = (filename[:-5],d.get("delete"),d.get("delete_button"),d.get("edit"))
                 cursor.execute(query_groups,row)
             else:
