@@ -62,7 +62,15 @@ async def CountVoid(message: types.Message):
 
 @dp.message_handler(commands=['newadmin'])
 async def AddAdminVoid(message: types.Message):
-    pass
+    if IsUserInBlackList(message.from_user.id):
+        return
+    if DBH.IsAdmin(message.from_user.id):
+        newAdminID = message.text
+        newAdminID = newAdminID.replace("/newadmin ", "")
+        print(newAdminID)
+        if newAdminID.isdigit():
+            if not DBH.IsAdmin(newAdminID):
+                DBH.AddAdmin(newAdminID)
 
 
 @dp.message_handler(commands=['stats'])
@@ -147,7 +155,8 @@ def CheckArgument(key, value):
             isAllOkArg = False
     elif key == "--admin" or key == "-a":
         if value.isdigit():
-            pass
+            if not DBH.IsAdmin(value):
+                DBH.AddAdmin(value)
         else:
             isAllOkArg = False
     elif key == "--updates" or key == "-u":
@@ -164,10 +173,12 @@ def CheckArgument(key, value):
 def LoadDataForBot():
     DBH.DbIntegrityCheck()
     LoadBlackList()
-    LoadCurrencies()
+    """ LoadCurrencies() """
     LoadDictionaries()
 
 if __name__ == '__main__':
+    LoadDataForBot()
+
     if len(sys.argv) == 3:
         if not CheckArgument(sys.argv[1], sys.argv[2]):
             sys.exit()
@@ -189,5 +200,4 @@ if __name__ == '__main__':
 
     # ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)
     # ThreadUpdateExchangeRates.start()
-    LoadDataForBot()
     executor.start_polling(dp, skip_updates=IsUpdate())

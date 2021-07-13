@@ -426,6 +426,14 @@ def GetAdmins():
     res = cursor.fetchall()
     return [k[0] for k in res]
 
+def IsAdmin(adminID):
+    adminID = int(adminID)
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM AdminsList WHERE adminID = "+str(adminID)+")")
+    res = cursor.fetchone()
+    return res[0]
+
 def AddAdmin(adminID):
     adminID = int(adminID)
     con = sql.connect('DataBases/ServiceData.sqlite')
