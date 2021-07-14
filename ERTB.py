@@ -21,8 +21,6 @@ bot = Bot(token=botToken)
 dp = Dispatcher(bot)
 
 # Public commands
-
-
 @dp.message_handler(commands=['about'])  # analog about and source
 async def AboutMes(message: types.Message):
     pass
@@ -48,8 +46,6 @@ async def WrongMes(message: types.Message):
     pass
 
 # Admin`s commands
-
-
 @dp.message_handler(commands=['echo'])
 async def EchoVoid(message: types.Message):
     pass
@@ -78,19 +74,25 @@ async def StatsVoid(message: types.Message):
     pass
 
 
-# analog "backup", "logs" and "reports".
-@dp.message_handler(commands=['pulloutalldata'])
+@dp.message_handler(commands=['pulloutalldata']) # analog "backup", "logs" and "reports".
 async def BackupVoid(message: types.Message):
     pass
 
 
 @dp.message_handler(commands=['unban'])
 async def UnbanVoid(message: types.Message):
-    pass
+    if IsUserInBlackList(message.from_user.id):
+        return
+    if DBH.IsAdmin(message.from_user.id):
+        unbanID = message.text
+        unbanID = unbanID.replace("/unban ", "")
+        print(unbanID)
+        if unbanID.isdigit():
+            if DBH.IsBlacklisted(unbanID):
+                DBH.ClearBlacklist(unbanID)
+
 
 # Technical commands
-
-
 @dp.message_handler(commands=['start'])
 async def StartVoid(message: types.Message):
     pass
@@ -113,19 +115,19 @@ async def MainVoid(message: types.Message):
     PrintMainInfo(message, MessageText)
 
     # Checking the chat in the database
-    """ if DBH.ChatExists(message.chat.id):
+    if DBH.ChatExists(message.chat.id):
         pass
     else:
-        DBH.AddID(message.chat.id, message.chat.type) """
+        DBH.AddID(message.chat.id, message.chat.type)
 
     # Check digit
-    if not any(map(str.isdigit, MessageText)):
-        return
+    """ if not any(map(str.isdigit, MessageText)):
+        return """
 
     MessageText = MessageText.lower()
+    MessageText = w2n.w2n.words_to_nums(MessageText)
     TextArray = SpecialSplit(MessageText)
     Print(TextArray)
-
 
     # поиск валют, если их нет, то возврат обратно, если есть, то продолжить
 
@@ -139,7 +141,6 @@ async def MainVoid(message: types.Message):
     for i in range(len(NumArray[0])):
         NumArray[1][i] = GetCur(NumArray[1][i])
         textMes += NumArray[0][i] + " " + NumArray[1][i] + "\n"
-
 
     await message.reply(textMes)
 
@@ -170,11 +171,13 @@ def CheckArgument(key, value):
         print("Error. Unknow argument '{}'".format(key))
     return isAllOkArg
 
+
 def LoadDataForBot():
     DBH.DbIntegrityCheck()
     LoadBlackList()
     """ LoadCurrencies() """
     LoadDictionaries()
+
 
 if __name__ == '__main__':
     LoadDataForBot()

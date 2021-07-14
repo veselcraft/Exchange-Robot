@@ -57,6 +57,11 @@ def DbIntegrityCheck():
         CreateServiceDataBase()
 
 def CreateServiceDataBase():
+    if os.path.exists("DataBases"):
+        pass
+    else:
+        print("Folder 'DataBases' not found")
+        sys.exit(1)
     print("Creating service DB is starting...")
     #Connect to DB
     con = sql.connect('DataBases/ServiceData.sqlite')
@@ -83,6 +88,12 @@ def CreateServiceDataBase():
     print("Service DB is created")
 
 def CreateDataBaseTemplate():
+    if os.path.exists("DataBases"):
+        pass
+    else:
+        print("Folder 'DataBases' not found")
+        os.mkdir("DataBases")
+        print("Folder 'DataBases' is created")
     print("Creating main DB is starting...")
     #Connect to DB
     con = sql.connect('DataBases/DataForBot.sqlite')
