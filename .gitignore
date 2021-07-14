@@ -4,4 +4,4 @@ logs/
 __pycaсhe__/
 *.pyc
 *.pyo
-DataBases/
+DataBases/*.sqlite

@@ -19,7 +19,6 @@ bnd
 bob
 brl
 bsd
-btc
 btn
 bwp
 byn,бр
@@ -131,7 +130,6 @@ shp
 sll
 sos
 srd
-std
 svc
 syp
 szl
@@ -157,11 +155,9 @@ xaf
 xag
 xau
 xcd
-xdr
 xof
 xpf
 yer
 zar
-zmk
 zmw
 zwl

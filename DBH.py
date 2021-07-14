@@ -299,6 +299,11 @@ def CreateStatsDataBase():
     print("Stats DB is created")
 
 def CreateServiceDataBase():
+    if os.path.exists("DataBases"):
+        pass
+    else:
+        print("Folder 'DataBases' not found")
+        sys.exit(1)
     print("Creating service DB is starting...")
     #Connect to DB
     con = sql.connect('DataBases/ServiceData.sqlite')
@@ -336,6 +341,12 @@ def CreateServiceDataBase():
     print("Service DB is created")
 
 def CreateDataBaseTemplate():
+    if os.path.exists("DataBases"):
+        pass
+    else:
+        print("Folder 'DataBases' not found")
+        os.mkdir("DataBases")
+        print("Folder 'DataBases' is created")
     print("Creating main DB is starting...")
     #Connect to DB
     con = sql.connect('DataBases/DataForBot.sqlite')
@@ -735,6 +746,14 @@ def GetAdmins():
     cursor.execute("SELECT * from AdminsList")
     res = cursor.fetchall()
     return [k[0] for k in res]
+
+def IsAdmin(adminID):
+    adminID = int(adminID)
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT EXISTS(SELECT 1 FROM AdminsList WHERE adminID = "+str(adminID)+")")
+    res = cursor.fetchone()
+    return res[0]
 
 def AddAdmin(adminID):
     adminID = int(adminID)
