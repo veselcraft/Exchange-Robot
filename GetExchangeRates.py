@@ -26,5 +26,3 @@ def UpdateExchangeRates():
         exchangeRates = GetExchangeRates()
 
     return exchangeRates.copy()
-
-UpdateExchangeRates()
