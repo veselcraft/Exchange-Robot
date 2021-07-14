@@ -175,5 +175,5 @@ if __name__ == '__main__':
 
     # ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)
     # ThreadUpdateExchangeRates.start()
-    """ DbIntegrityCheck() """
+    DbIntegrityCheck()
     executor.start_polling(dp, skip_updates=IsUpdate())
