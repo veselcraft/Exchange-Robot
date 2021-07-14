@@ -1,5 +1,4 @@
 # Token
-from typing import Text
 from Token import botToken
 
 # Public libraries
@@ -8,23 +7,20 @@ from aiogram.types.message import ContentType
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from threading import Thread
 import sys
-import w2n
 
 # Own libraries
-from DBH import DbIntegrityCheck
-from NewPrint import Print, EnableLogging, DisableLogging
+import DBH
+from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, UpdateExchangeRates
-from LogOut import LogMainInfo
-from Processing import SpecialSplit, TextToDigit
+from BlackList import IsUserInBlackList, LoadBlackList
+from Processing import LoadCurrencies, LoadDictionaries, SearchValuesAndCurrencies, SpecialSplit, TextToDigit, GetCur
 
 # Main variables
 bot = Bot(token=botToken)
 dp = Dispatcher(bot)
 
 # Public commands
-
-
 @dp.message_handler(commands=['about'])  # analog about and source
 async def AboutMes(message: types.Message):
     pass
@@ -50,8 +46,6 @@ async def WrongMes(message: types.Message):
     pass
 
 # Admin`s commands
-
-
 @dp.message_handler(commands=['echo'])
 async def EchoVoid(message: types.Message):
     pass
@@ -64,7 +58,15 @@ async def CountVoid(message: types.Message):
 
 @dp.message_handler(commands=['newadmin'])
 async def AddAdminVoid(message: types.Message):
-    pass
+    if IsUserInBlackList(message.from_user.id):
+        return
+    if DBH.IsAdmin(message.from_user.id):
+        newAdminID = message.text
+        newAdminID = newAdminID.replace("/newadmin ", "")
+        print(newAdminID)
+        if newAdminID.isdigit():
+            if not DBH.IsAdmin(newAdminID):
+                DBH.AddAdmin(newAdminID)
 
 
 @dp.message_handler(commands=['stats'])
@@ -72,25 +74,35 @@ async def StatsVoid(message: types.Message):
     pass
 
 
-# analog "backup", "logs" and "reports".
-@dp.message_handler(commands=['pulloutalldata'])
+@dp.message_handler(commands=['pulloutalldata']) # analog "backup", "logs" and "reports".
 async def BackupVoid(message: types.Message):
     pass
 
 
 @dp.message_handler(commands=['unban'])
 async def UnbanVoid(message: types.Message):
-    pass
+    if IsUserInBlackList(message.from_user.id):
+        return
+    if DBH.IsAdmin(message.from_user.id):
+        unbanID = message.text
+        unbanID = unbanID.replace("/unban ", "")
+        print(unbanID)
+        if unbanID.isdigit():
+            if DBH.IsBlacklisted(unbanID):
+                DBH.ClearBlacklist(unbanID)
+
 
 # Technical commands
-
-
 @dp.message_handler(commands=['start'])
 async def StartVoid(message: types.Message):
     pass
 
+
 @dp.message_handler(content_types=ContentType.ANY)
 async def MainVoid(message: types.Message):
+    # Checking if a user is on the blacklist
+    if IsUserInBlackList(message.from_user.id):
+        return
 
     # Get message text
     MessageText = message.text
@@ -98,34 +110,40 @@ async def MainVoid(message: types.Message):
         MessageText = message.caption
     if MessageText is None or MessageText == "":
         return
-        
+
     # Logging basic information to terminal
-    LogMainInfo(message, MessageText)
-    
-    #тут проверка чата, есть ли он в БД и надо ли создавать под него настройки
+    PrintMainInfo(message, MessageText)
+
+    # Checking the chat in the database
+    if DBH.ChatExists(message.chat.id):
+        pass
+    else:
+        DBH.AddID(message.chat.id, message.chat.type)
 
     # Check digit
-    if not any(map(str.isdigit, MessageText)):
-        return
-    
+    """ if not any(map(str.isdigit, MessageText)):
+        return """
+
     MessageText = MessageText.lower()
-
-    # проверка на пасхалки
-
-    MessageText = w2n.word_to_num(MessageText)
+    MessageText = w2n.w2n.words_to_nums(MessageText)
     TextArray = SpecialSplit(MessageText)
+    Print(TextArray)
 
     # поиск валют, если их нет, то возврат обратно, если есть, то продолжить
 
     TextArray = TextToDigit(TextArray)
-
     Print(TextArray)
 
+    NumArray = SearchValuesAndCurrencies(TextArray)
+    Print(NumArray)
 
+    textMes = ''
+    for i in range(len(NumArray[0])):
+        NumArray[1][i] = GetCur(NumArray[1][i])
+        textMes += NumArray[0][i] + " " + NumArray[1][i] + "\n"
 
-    
+    await message.reply(textMes)
 
-    
 
 def CheckArgument(key, value):
     isAllOkArg = True
@@ -138,7 +156,8 @@ def CheckArgument(key, value):
             isAllOkArg = False
     elif key == "--admin" or key == "-a":
         if value.isdigit():
-            pass
+            if not DBH.IsAdmin(value):
+                DBH.AddAdmin(value)
         else:
             isAllOkArg = False
     elif key == "--updates" or key == "-u":
@@ -153,7 +172,16 @@ def CheckArgument(key, value):
     return isAllOkArg
 
 
+def LoadDataForBot():
+    DBH.DbIntegrityCheck()
+    LoadBlackList()
+    """ LoadCurrencies() """
+    LoadDictionaries()
+
+
 if __name__ == '__main__':
+    LoadDataForBot()
+
     if len(sys.argv) == 3:
         if not CheckArgument(sys.argv[1], sys.argv[2]):
             sys.exit()
@@ -175,5 +203,4 @@ if __name__ == '__main__':
 
     # ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)
     # ThreadUpdateExchangeRates.start()
-    DbIntegrityCheck()
     executor.start_polling(dp, skip_updates=IsUpdate())
