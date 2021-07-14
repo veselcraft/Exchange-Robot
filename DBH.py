@@ -4,9 +4,9 @@ import os
 from typing import Set
 import json
 
-listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "SettingsExchangeRates", "sqlite_sequence"]
-listOfServiceTables = ["AdminsList", "BlackList", "sqlite_sequence"]
-listOfStatsTables = ["ChatsUsage","ChatsTimeStats","ProcessedCurrencies"]
+listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "SettingsExchangeRates","CryptoRates","SettingsCryptoRates"]
+listOfServiceTables = ["AdminsList", "BlackList","Reports"]
+listOfStatsTables = ["ChatsTimeStats","ChatsUsage","ProcessedCurrencies"]
 #_SettingsGroups = ["chatID", "deleteRules", "deleteButton", "editSettings", "flags"]
 #_SettingsPrivateChats = ["chatID", "deleteButton", "flags"]
 #_ExchangeRates = ["currency", "flag", "exchangeRates"]
@@ -61,6 +61,7 @@ def DbIntegrityCheck():
     if os.path.exists("DataBases/StatsData.sqlite"):
         con = sql.connect("DataBases/StatsData.sqlite")
         cursor = con.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         listNames = cursor.fetchall()
         for i in range(len(listNames)):
             listNames[i]=listNames[i][0]
@@ -276,7 +277,21 @@ def CreateStatsDataBase():
                 _YER INTEGER DEFAULT 0,
                 _ZAR INTEGER DEFAULT 0,
                 _ZMW INTEGER DEFAULT 0,
-                _ZWL INTEGER DEFAULT 0
+                _ZWL INTEGER DEFAULT 0,
+                BTC INTEGER DEFAULT 0,
+                ETH INTEGER DEFAULT 0,
+                BNB INTEGER DEFAULT 0,
+                XRP INTEGER DEFAULT 0,
+                DOGE INTEGER DEFAULT 0,
+                BCH INTEGER DEFAULT 0,
+                LTC INTEGER DEFAULT 0,
+                ETC INTEGER DEFAULT 0,
+                XLM INTEGER DEFAULT 0,
+                TRX INTEGER DEFAULT 0,
+                XMR INTEGER DEFAULT 0,
+                DASH INTEGER DEFAULT 0,
+                RVN INTEGER DEFAULT 0,
+                ADA INTEGER DEFAULT 0
             );
         """)
 
@@ -303,6 +318,17 @@ def CreateServiceDataBase():
                 banDate TEXT DEFAULT 0,
                 chatID INTEGER DEFAULT 0,
                 chatName TEXT DEFAULT 0
+            );
+        """)
+    
+    with con:
+        con.execute("""
+            CREATE TABLE Reports (
+                date TEXT,
+                chatID INTEGER DEFAULT 0,
+                userID INTEGER DEFAULT 0,
+                message TEXT,
+                reply TEXT
             );
         """)
 
@@ -343,6 +369,36 @@ def CreateDataBaseTemplate():
                 exchangeRates FLOAT
             );
         """)
+    with con:
+        con.execute("""
+            CREATE TABLE CryptoRates (
+                currency TEXT NOT NULL PRIMARY KEY,
+                flag TEXT,
+                exchangeRates FLOAT
+            );
+        """)
+    
+    with con:
+        con.execute("""
+            CREATE TABLE SettingsCryptoRates (
+                chatID INTEGER NOT NULL PRIMARY KEY,
+                BTC INTEGER DEFAULT 0,
+                ETH INTEGER DEFAULT 0,
+                BNB INTEGER DEFAULT 0,
+                XRP INTEGER DEFAULT 0,
+                DOGE INTEGER DEFAULT 0,
+                BCH INTEGER DEFAULT 0,
+                LTC INTEGER DEFAULT 0,
+                ETC INTEGER DEFAULT 0,
+                XLM INTEGER DEFAULT 0,
+                TRX INTEGER DEFAULT 0,
+                XMR INTEGER DEFAULT 0,
+                DASH INTEGER DEFAULT 0,
+                RVN INTEGER DEFAULT 0,
+                ADA INTEGER DEFAULT 0
+            );
+        """)
+    
     with con:
         con.execute("""
             CREATE TABLE SettingsExchangeRates (
@@ -521,11 +577,13 @@ def AddID(chatID, chatType):
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     cursor.execute("INSERT OR IGNORE INTO SettingsExchangeRates (chatID) values (?)",tuple([chatID]))
+    cursor.execute("INSERT OR IGNORE INTO SettingsCryptoRates (chatID) values (?)",tuple([chatID]))
     if chatType=="group" or chatType=="supergroup":
         cursor.execute("INSERT OR IGNORE INTO SettingsGroups (chatID) values (?)",tuple([chatID]))
     else:
         cursor.execute("INSERT OR IGNORE INTO SettingsPrivateChats (chatID) values (?)",tuple([chatID]))
     con.commit()
+
 
 def SetSetting(chatID, key, val, chatType):
     chatID = int(chatID)
@@ -539,6 +597,28 @@ def SetSetting(chatID, key, val, chatType):
         con.commit()
     except:
         print("No such column")
+
+def SetCurrencySetting(chatID, currency, val):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    try:
+        cursor.execute("UPDATE OR ABORT SettingsExchangeRates SET "+"_"+str(currency)+"= "+str(val)+" WHERE chatID = "+str(chatID))
+        con.commit()
+    except:
+        print("No such column")
+
+def SetCryptoSetting(chatID, crypto, val):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    try:
+        cursor.execute("UPDATE OR ABORT SettingsCryptoRates SET "+str(crypto)+"= "+str(val)+" WHERE chatID = "+str(chatID))
+        con.commit()
+    except:
+        print("No such column")
+
+
 
 def GetAllSettings(chatID, chatType):
     chatID = int(chatID)
@@ -572,6 +652,7 @@ def GetSetting(chatID,key,chatType):
     except:
         print("No such column")
         return None
+
 def GetAllCurrencies(chatID):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
@@ -581,6 +662,19 @@ def GetAllCurrencies(chatID):
         cursor.execute("SELECT * FROM SettingsExchangeRates WHERE chatID = "+str(chatID))
         res = dict(cursor.fetchone())
         return [k[1:] for k,v in res.items() if v==1]
+    except:
+        print("No such chatID")
+        return None
+
+def GetAllCrypto(chatID):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    con.row_factory = sql.Row
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT * FROM SettingsCryptoRates WHERE chatID = "+str(chatID))
+        res = dict(cursor.fetchone())
+        return [k for k,v in res.items() if v==1]
     except:
         print("No such chatID")
         return None
@@ -607,6 +701,8 @@ def ClearBlacklist(userID):
     cursor = con.cursor()
     if userID==0:
         cursor.execute("DELETE FROM BlackList")
+        con.commit()
+        cursor.execute("VACUUM")
         con.commit()
         return 1
     else:
@@ -679,11 +775,19 @@ def UpdateExchangeRatesDB(exchangeRates):
     data = json.load(f)
     for cur, rate in exchangeRates.items():
         flag = next((item for item in data['currencies'] if item['code']==cur),None)
-        print(flag)
         try:
             cursor.execute("INSERT OR REPLACE INTO ExchangeRates (currency,flag,exchangeRates) values ('"+cur+"','"+flag["emoji"]+"',?)",tuple([rate]))
         except:
             continue
+    con.commit()
+
+def UpdateCryptoRatesDB(cryptoRates):
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    f = open("Dictionaries/currencies.json",encoding="utf-8")
+    data = json.load(f)
+    for cur, rate in cryptoRates.items():
+        cursor.execute("INSERT OR REPLACE INTO CryptoRates (currency,flag,exchangeRates) values ('"+cur[:-4]+"','"+""+"',?)",tuple([rate]))
     con.commit()
 
 def AddIDStats(chatID,chatType):
@@ -753,6 +857,16 @@ def GetExchangeRates():
         res_dict[i[0]]=i[2]
     return res_dict
 
+def GetCryptoRates():
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT * FROM CryptoRates")
+    res = cursor.fetchall()
+    res_dict = {}
+    for i in res:
+        res_dict[i[0]]=i[2]
+    return res_dict
+
 def GetStatsInPeriod(days):
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
@@ -763,3 +877,16 @@ def GetStatsInPeriod(days):
     res['activeGroups'] = cursor.fetchone()[0]
     return res
 
+def AddReport(chatID, userID, message, reply=""):
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("INSERT INTO Reports (date,chatID,userID,message,reply) values (DATETIME(),?,?,?,?)",tuple([chatID,userID,message,reply]))
+    con.commit()
+
+def ClearReports():
+    con = sql.connect('DataBases/ServiceData.sqlite')
+    cursor = con.cursor()
+    cursor.execute("DELETE FROM Reports")
+    con.commit()
+    cursor.execute("VACUUM")
+    con.commit()
