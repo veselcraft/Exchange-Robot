@@ -121,11 +121,10 @@ async def MainVoid(message: types.Message):
         DBH.AddID(message.chat.id, message.chat.type)
 
     # Check digit
-    """ if not any(map(str.isdigit, MessageText)):
-        return """
+    if not any(map(str.isdigit, MessageText)):
+        return
 
     MessageText = MessageText.lower()
-    MessageText = w2n.w2n.words_to_nums(MessageText)
     TextArray = SpecialSplit(MessageText)
     Print(TextArray)
 
