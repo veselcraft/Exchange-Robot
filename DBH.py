@@ -4,6 +4,8 @@ import os
 from typing import Set
 import json
 
+from NewPrint import Print
+
 listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "SettingsExchangeRates","CryptoRates","SettingsCryptoRates"]
 listOfServiceTables = ["AdminsList", "BlackList","Reports"]
 listOfStatsTables = ["ChatsTimeStats","ChatsUsage","ProcessedCurrencies"]
@@ -13,7 +15,7 @@ def DbIntegrityCheck():
         #Connect to DB
         con = sql.connect('DataBases/DataForBot.sqlite')
         cursor = con.cursor()
-        print("Connected to main DB successfully.")
+        Print("Connected to main DB successfully.", 'S')
 
         #Getting all names of tables
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -24,19 +26,19 @@ def DbIntegrityCheck():
         for i in listOfTables:
             if not i in listNames:
                 os.remove('DataBases/DataForBot.sqlite')
-                print("Error. Main database is corrupted. 'DataForBot.sqlite' was deleted. New database will be create automatically.")
+                Print("Error. Main database is corrupted. 'DataForBot.sqlite' was deleted. New database will be create automatically.", "E")
                 CreateDataBaseTemplate()
                 break
-        print("Main DB is OK.")
+        Print("Main DB is OK.", "S")
     else:
-        print("Connected to main DB unsuccessfully.")
+        Print("Connected to main DB unsuccessfully.", "E")
         CreateDataBaseTemplate()
 
     if os.path.exists("DataBases/ServiceData.sqlite"):
         #Connect to DB
         con = sql.connect('DataBases/ServiceData.sqlite')
         cursor = con.cursor()
-        print("Connected to service DB successfully.")
+        Print("Connected to service DB successfully.", "S")
 
         #Getting all names of tables
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -47,12 +49,12 @@ def DbIntegrityCheck():
         for i in listOfServiceTables:
             if not i in listNames:
                 os.remove('DataBases/ServiceData.sqlite')
-                print("Error. Service database is corrupted. 'ServiceData.sqlite' was deleted. New database will be create automatically.")
+                Print("Error. Service database is corrupted. 'ServiceData.sqlite' was deleted. New database will be create automatically.", "E")
                 CreateServiceDataBase()
                 break
-        print("Service DB is OK.")
+        Print("Service DB is OK.", "S")
     else:
-        print("Connected to service DB unsuccessfully.")
+        Print("Connected to service DB unsuccessfully.", "E")
         CreateServiceDataBase()
 
     if os.path.exists("DataBases/StatsData.sqlite"):
@@ -66,17 +68,17 @@ def DbIntegrityCheck():
         for i in listOfStatsTables:
             if not i in listNames:
                 os.remove("DataBases/StatsData.sqlite")
-                print("Error. Stats database is corrupted. 'StatsData.sqlite' was deleted. New database will be create automatically.")
+                Print("Error. Stats database is corrupted. 'StatsData.sqlite' was deleted. New database will be create automatically.", "E")
                 CreateStatsDataBase()
                 break
-        print("Stats DB is OK.")
+        Print("Stats DB is OK.", "S")
     else:
-        print("Connected to stats DB unsuccessfully.")
+        print("Connected to stats DB unsuccessfully.", "E")
         CreateStatsDataBase()
 
 
 def CreateStatsDataBase():
-    print("Creating stats DB is starting...")
+    Print("Creating stats DB is starting...", "S")
     #Connect to DB
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
@@ -293,15 +295,15 @@ def CreateStatsDataBase():
         """)
 
     con.close()
-    print("Stats DB is created")
+    Print("Stats DB is created.", "S")
 
 def CreateServiceDataBase():
     if os.path.exists("DataBases"):
         pass
     else:
-        print("Folder 'DataBases' not found")
+        Print("Folder 'DataBases' not found", "E")
         sys.exit(1)
-    print("Creating service DB is starting...")
+    Print("Creating service DB is starting...", "S")
     #Connect to DB
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
@@ -335,16 +337,16 @@ def CreateServiceDataBase():
         """)
 
     con.close()
-    print("Service DB is created")
+    Print("Service DB is created.", "S")
 
 def CreateDataBaseTemplate():
     if os.path.exists("DataBases"):
         pass
     else:
-        print("Folder 'DataBases' not found")
+        Print("Folder 'DataBases' not found", "E")
         os.mkdir("DataBases")
-        print("Folder 'DataBases' is created")
-    print("Creating main DB is starting...")
+        Print("Folder 'DataBases' is created", "S")
+    Print("Creating main DB is starting...", "S")
     #Connect to DB
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
@@ -393,11 +395,11 @@ def CreateDataBaseTemplate():
                 ADA INTEGER DEFAULT 0,
                 BCH INTEGER DEFAULT 0,
                 BNB INTEGER DEFAULT 0,
-                BTC INTEGER DEFAULT 0,
+                BTC INTEGER DEFAULT 1,
                 DASH INTEGER DEFAULT 0,
                 DOGE INTEGER DEFAULT 0,
                 ETC INTEGER DEFAULT 0,
-                ETH INTEGER DEFAULT 0,
+                ETH INTEGER DEFAULT 1,
                 LTC INTEGER DEFAULT 0,
                 RVN INTEGER DEFAULT 0,
                 TRX INTEGER DEFAULT 0,
@@ -531,7 +533,7 @@ def CreateDataBaseTemplate():
                 _QAR INTEGER DEFAULT 0,
                 _RON INTEGER DEFAULT 0,
                 _RSD INTEGER DEFAULT 0,
-                _RUB INTEGER DEFAULT 0,
+                _RUB INTEGER DEFAULT 1,
                 _RWF INTEGER DEFAULT 0,
                 _SAR INTEGER DEFAULT 0,
                 _SBD INTEGER DEFAULT 0,
@@ -578,7 +580,7 @@ def CreateDataBaseTemplate():
         """)
     
     con.close()
-    print("Main DB is created.")
+    Print("Main DB is created.", "S")
 
 def AddID(chatID, chatType):
     chatID = int(chatID)
@@ -604,7 +606,7 @@ def SetSetting(chatID, key, val, chatType):
             cursor.execute("UPDATE OR ABORT SettingsPrivateChats SET "+str(key)+"= "+str(val)+" WHERE chatID = "+str(chatID))
         con.commit()
     except:
-        print("No such column")
+        Print("No such column.", "E")
 
 def SetCurrencySetting(chatID, currency, val):
     chatID = int(chatID)
@@ -614,7 +616,7 @@ def SetCurrencySetting(chatID, currency, val):
         cursor.execute("UPDATE OR ABORT SettingsExchangeRates SET "+"_"+str(currency)+"= "+str(val)+" WHERE chatID = "+str(chatID))
         con.commit()
     except:
-        print("No such column")
+        Print("No such column.", "E")
 
 def SetCryptoSetting(chatID, crypto, val):
     chatID = int(chatID)
@@ -624,7 +626,7 @@ def SetCryptoSetting(chatID, crypto, val):
         cursor.execute("UPDATE OR ABORT SettingsCryptoRates SET "+str(crypto)+"= "+str(val)+" WHERE chatID = "+str(chatID))
         con.commit()
     except:
-        print("No such column")
+        Print("No such column.", "E")
 
 def GetAllSettings(chatID, chatType):
     chatID = int(chatID)
@@ -640,7 +642,7 @@ def GetAllSettings(chatID, chatType):
             res = cursor.fetchone()
         return dict(res)
     except:
-        print("No such chatID")
+        Print("No such chatID.", "E")
         return None
 
 def GetSetting(chatID,key,chatType):
@@ -656,7 +658,7 @@ def GetSetting(chatID,key,chatType):
             res = cursor.fetchone()
         return res[0]
     except:
-        print("No such column")
+        Print("No such column.", "E")
         return None
 
 def GetAllCurrencies(chatID):
@@ -669,7 +671,7 @@ def GetAllCurrencies(chatID):
         res = dict(cursor.fetchone())
         return [k[1:] for k,v in res.items() if v==1]
     except:
-        print("No such chatID")
+        Print("No such chatID.", "E")
         return None
 
 def GetAllCrypto(chatID):
@@ -680,9 +682,9 @@ def GetAllCrypto(chatID):
     try:
         cursor.execute("SELECT * FROM SettingsCryptoRates WHERE chatID = "+str(chatID))
         res = dict(cursor.fetchone())
-        return [k for k,v in res.items() if v==1]
+        return [k for k, v in res.items() if v==1]
     except:
-        print("No such chatID")
+        Print("No such chatID.", "E")
         return None
 
 def ChatExists(chatID):
@@ -717,7 +719,7 @@ def ClearBlacklist(userID):
             con.commit()
             return 1
         except:
-            print("No such userID")
+            Print("No such userID.", "E")
             return None
  
 def AddBlacklist(userID,chatID=0,chatName=""):
@@ -770,7 +772,7 @@ def ClearAdmins(adminID):
             con.commit()
             return 1
         except:
-            print("No such adminID")
+            Print("No such adminID.", "E")
             return None
 
 def GetListOfCurrencies():
@@ -785,7 +787,7 @@ def GetListOfCrypto():
     cursor = con.execute("SELECT * FROM SettingsCryptoRates")
     names = [description[0] for description in cursor.description]
     names.pop(0)
-    return [i[1:] for i in names]
+    return [i[0:] for i in names]
 
 def UpdateExchangeRatesDB(exchangeRates):
     con = sql.connect('DataBases/DataForBot.sqlite')

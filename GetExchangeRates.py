@@ -25,21 +25,23 @@ def SheduleCryptoUpdate():
 
 def UpdateExchangeRates():
     global exchangeRates
-    Print("Updating of exchange rates has started.")
+    Print("Updating of exchange rates has started.", "S")
     try:
         url = "http://1data.fixer.io/api/latest?access_key=" + apiKey
         response = requests.get(url)
         exchangeRates = response.json()['rates']
-        Print(exchangeRates)
+
         UpdateExchangeRatesDB(exchangeRates.copy())
+        Print("Updating of exchange rates is successfull.", "S")
     except:
-        print("Updating ER failed. Using rates from DB")
+        Print("Updating ER failed.", "E")
+        Print("Using exchange rates from DB.", "S")
         exchangeRates = GetExchangeRates()
     return exchangeRates.copy()
 
 def UpdateCryptoRates():
     global cryptoRates
-    Print("Updating of crypto rates has started.")
+    Print("Updating of crypto rates has started.", "S")
     try:
         url = "https://api.binance.com/api/v3/ticker/price1"
         response = requests.get(url)
@@ -48,7 +50,9 @@ def UpdateCryptoRates():
             if pair['symbol'].find("USDT") != -1 and any(pair['symbol'][:-4] == s for s in cryptoList):
                 cryptoRates[pair['symbol']]=pair['price']
         UpdateCryptoRatesDB(cryptoRates.copy())
+        Print("Updating of exchange rates is successfull.", "S")
     except:
-        print("Updating CR failed. Using rates from DB")
+        Print("Updating CR failed.", "E")
+        Print("Using crypto rates from DB.", "S")
         cryptoRates = GetCryptoRates()
     return cryptoRates.copy()

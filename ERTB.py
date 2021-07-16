@@ -63,7 +63,6 @@ async def AddAdminVoid(message: types.Message):
     if DBH.IsAdmin(message.from_user.id):
         newAdminID = message.text
         newAdminID = newAdminID.replace("/newadmin ", "")
-        print(newAdminID)
         if newAdminID.isdigit():
             if not DBH.IsAdmin(newAdminID):
                 DBH.AddAdmin(newAdminID)
@@ -86,7 +85,6 @@ async def UnbanVoid(message: types.Message):
     if DBH.IsAdmin(message.from_user.id):
         unbanID = message.text
         unbanID = unbanID.replace("/unban ", "")
-        print(unbanID)
         if unbanID.isdigit():
             if DBH.IsBlacklisted(unbanID):
                 DBH.ClearBlacklist(unbanID)
@@ -127,30 +125,22 @@ async def MainVoid(message: types.Message):
     # Preparing a message for searching currencies
     MessageText = MessageText.lower()
     TextArray = SpecialSplit(MessageText)
-    Print(TextArray)
+    Print(str(TextArray), "L")
 
     # '5kk USD' to '5000000 USD'
     TextArray = TextToDigit(TextArray)
-    Print(TextArray)
+    Print(str(TextArray), "L")
     
     # Searching Currencies
     NumArray = SearchValuesAndCurrencies(TextArray)
-    Print(NumArray)
+    Print(str(NumArray), "L")
 
     # If there are no currencies, then work is interrupted
-    if NumArray == [[],[]]:
+    if NumArray == [[],[],[],[]]:
         return
 
     result = AnswerText(NumArray, message.chat.id)
-    print(result)
-    await message.reply("1")
-
-    """ textMes = ''
-    for i in range(len(NumArray[0])):
-        NumArray[1][i] = GetCur(NumArray[1][i])
-        textMes += NumArray[0][i] + " " + NumArray[1][i] + "\n"
-
-    await message.reply(textMes) """
+    await message.reply(result)
 
 def CheckArgument(key, value):
     isAllOkArg = True
@@ -207,7 +197,7 @@ if __name__ == '__main__':
         elif not CheckArgument(sys.argv[5], sys.argv[6]):
             sys.exit()
     elif len(sys.argv) == 5 and not sys.argv[1] != sys.argv[3] or len(sys.argv) == 7 and not (sys.argv[1] != sys.argv[3] and sys.argv[1] != sys.argv[2] and sys.argv[2] != sys.argv[3]):
-        print("Error. Duplicate argument.")
+        Print("Error. Duplicate argument.", "E")
         sys.exit()
 
     ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)

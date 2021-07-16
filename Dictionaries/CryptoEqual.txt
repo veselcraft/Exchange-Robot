@@ -1,0 +1,14 @@
+ada
+bch
+bnb
+btc
+dash
+doge
+etc
+eth
+ltc
+rvn
+trx
+xlm
+xmr
+xrp

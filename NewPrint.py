@@ -1,10 +1,27 @@
 from aiogram.types.message import ContentType
+
 consoleLog = True
 import datetime
 
-def Print(printingText):
+counterS = 0
+counterL = 0
+counterE = 0
+
+def Print(printingText: str, status: str):
+    global counterS, counterL, counterE
     if consoleLog:
-        print(printingText)
+        status = status.lower()
+        if status == 's':
+            print("Service " + str(counterS) + ": " + printingText)
+            counterS += 1
+        elif status == 'e':
+            print("\033[31m{} ".format("Error") + "\033[37m{}".format(str(counterE)) + ": "+ printingText)
+            counterE += 1
+        elif status == 'l':
+            print("Log " + str(counterL) + ": " + printingText)
+            counterL += 1
+        elif status == '':
+            print(printingText)
 
 def EnableLogging():
     global consoleLog
@@ -14,12 +31,12 @@ def DisableLogging():
     global consoleLog
     consoleLog = False
 
-def PrintMainInfo(mes, mestxt):
+def PrintMainInfo(mes, mestxt: str):
     now = datetime.datetime.now()
-    Print("")
-    Print("******************************")
-    Print(now.strftime("%d-%m-%Y %H:%M:%S"))
-    Print("Username: " + str(mes.from_user.username) + " | User ID: " + str(mes.from_user.id) + " | First name: " + str(mes.from_user.first_name) + " | Last name: " + str(mes.from_user.last_name))
-    Print("Chat ID: " + str(mes.chat.id) + " | Chat name: " + str(mes.chat.title) + " | Chat username: "+str(mes.chat.username) + " | Chat type: "+str(mes.chat.type))
-    Print("")
-    Print("Message: " + str(mestxt))
+    Print("","")
+    Print("******************************","")
+    Print(now.strftime("%d-%m-%Y %H:%M:%S"),"L")
+    Print("Username: " + str(mes.from_user.username) + " | User ID: " + str(mes.from_user.id) + " | First name: " + str(mes.from_user.first_name) + " | Last name: " + str(mes.from_user.last_name), "L")
+    Print("Chat ID: " + str(mes.chat.id) + " | Chat name: " + str(mes.chat.title) + " | Chat username: "+str(mes.chat.username) + " | Chat type: "+str(mes.chat.type), "L")
+    Print("","")
+    Print("Message: " + str(mestxt),    "L")
