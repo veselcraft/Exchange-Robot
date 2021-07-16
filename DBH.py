@@ -7,9 +7,6 @@ import json
 listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "SettingsExchangeRates","CryptoRates","SettingsCryptoRates"]
 listOfServiceTables = ["AdminsList", "BlackList","Reports"]
 listOfStatsTables = ["ChatsTimeStats","ChatsUsage","ProcessedCurrencies"]
-#_SettingsGroups = ["chatID", "deleteRules", "deleteButton", "editSettings", "flags"]
-#_SettingsPrivateChats = ["chatID", "deleteButton", "flags"]
-#_ExchangeRates = ["currency", "flag", "exchangeRates"]
 
 def DbIntegrityCheck():
     if os.path.exists("DataBases/DataForBot.sqlite"):
@@ -278,20 +275,20 @@ def CreateStatsDataBase():
                 _ZAR INTEGER DEFAULT 0,
                 _ZMW INTEGER DEFAULT 0,
                 _ZWL INTEGER DEFAULT 0,
-                BTC INTEGER DEFAULT 0,
-                ETH INTEGER DEFAULT 0,
-                BNB INTEGER DEFAULT 0,
-                XRP INTEGER DEFAULT 0,
-                DOGE INTEGER DEFAULT 0,
+                ADA INTEGER DEFAULT 0,
                 BCH INTEGER DEFAULT 0,
-                LTC INTEGER DEFAULT 0,
-                ETC INTEGER DEFAULT 0,
-                XLM INTEGER DEFAULT 0,
-                TRX INTEGER DEFAULT 0,
-                XMR INTEGER DEFAULT 0,
+                BNB INTEGER DEFAULT 0,
+                BTC INTEGER DEFAULT 0,
                 DASH INTEGER DEFAULT 0,
+                DOGE INTEGER DEFAULT 0,
+                ETC INTEGER DEFAULT 0,
+                ETH INTEGER DEFAULT 0,
+                LTC INTEGER DEFAULT 0,
                 RVN INTEGER DEFAULT 0,
-                ADA INTEGER DEFAULT 0
+                TRX INTEGER DEFAULT 0,
+                XLM INTEGER DEFAULT 0,
+                XMR INTEGER DEFAULT 0,
+                XRP INTEGER DEFAULT 0
             );
         """)
 
@@ -393,20 +390,20 @@ def CreateDataBaseTemplate():
         con.execute("""
             CREATE TABLE SettingsCryptoRates (
                 chatID INTEGER NOT NULL PRIMARY KEY,
-                BTC INTEGER DEFAULT 0,
-                ETH INTEGER DEFAULT 0,
-                BNB INTEGER DEFAULT 0,
-                XRP INTEGER DEFAULT 0,
-                DOGE INTEGER DEFAULT 0,
+                ADA INTEGER DEFAULT 0,
                 BCH INTEGER DEFAULT 0,
-                LTC INTEGER DEFAULT 0,
-                ETC INTEGER DEFAULT 0,
-                XLM INTEGER DEFAULT 0,
-                TRX INTEGER DEFAULT 0,
-                XMR INTEGER DEFAULT 0,
+                BNB INTEGER DEFAULT 0,
+                BTC INTEGER DEFAULT 0,
                 DASH INTEGER DEFAULT 0,
+                DOGE INTEGER DEFAULT 0,
+                ETC INTEGER DEFAULT 0,
+                ETH INTEGER DEFAULT 0,
+                LTC INTEGER DEFAULT 0,
                 RVN INTEGER DEFAULT 0,
-                ADA INTEGER DEFAULT 0
+                TRX INTEGER DEFAULT 0,
+                XLM INTEGER DEFAULT 0,
+                XMR INTEGER DEFAULT 0,
+                XRP INTEGER DEFAULT 0  
             );
         """)
     
@@ -458,10 +455,10 @@ def CreateDataBaseTemplate():
                 _EGP INTEGER DEFAULT 0,
                 _ERN INTEGER DEFAULT 0,
                 _ETB INTEGER DEFAULT 0,
-                _EUR INTEGER DEFAULT 0,
+                _EUR INTEGER DEFAULT 1,
                 _FJD INTEGER DEFAULT 0,
                 _FKP INTEGER DEFAULT 0,
-                _GBP INTEGER DEFAULT 0,
+                _GBP INTEGER DEFAULT 1,
                 _GEL INTEGER DEFAULT 0,
                 _GGP INTEGER DEFAULT 0,
                 _GHS INTEGER DEFAULT 0,
@@ -558,9 +555,9 @@ def CreateDataBaseTemplate():
                 _TTD INTEGER DEFAULT 0,
                 _TWD INTEGER DEFAULT 0,
                 _TZS INTEGER DEFAULT 0,
-                _UAH INTEGER DEFAULT 0,
+                _UAH INTEGER DEFAULT 1,
                 _UGX INTEGER DEFAULT 0,
-                _USD INTEGER DEFAULT 0,
+                _USD INTEGER DEFAULT 1,
                 _UYU INTEGER DEFAULT 0,
                 _UZS INTEGER DEFAULT 0,
                 _VEF INTEGER DEFAULT 0,
@@ -628,8 +625,6 @@ def SetCryptoSetting(chatID, crypto, val):
         con.commit()
     except:
         print("No such column")
-
-
 
 def GetAllSettings(chatID, chatType):
     chatID = int(chatID)
@@ -724,8 +719,7 @@ def ClearBlacklist(userID):
         except:
             print("No such userID")
             return None
-
-        
+ 
 def AddBlacklist(userID,chatID=0,chatName=""):
     chatID = int(chatID)
     con = sql.connect('DataBases/ServiceData.sqlite')
@@ -786,6 +780,12 @@ def GetListOfCurrencies():
     names.pop(0)
     return [i[1:] for i in names]
 
+def GetListOfCrypto():
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.execute("SELECT * FROM SettingsCryptoRates")
+    names = [description[0] for description in cursor.description]
+    names.pop(0)
+    return [i[1:] for i in names]
 
 def UpdateExchangeRatesDB(exchangeRates):
     con = sql.connect('DataBases/DataForBot.sqlite')
@@ -865,6 +865,16 @@ def ProcessedCurrency(chatID, userID, processedCurrency, message, turnedOnCurren
     query = query+")"
     cursor.execute(query,tuple(values_q))
     con.commit()
+
+def GetListOfFlags():
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT * FROM ExchangeRates")
+    res = cursor.fetchall()
+    res_dict = {}
+    for i in res:
+        res_dict[i[0]]=i[1]
+    return res_dict
 
 def GetExchangeRates():
     con = sql.connect('DataBases/DataForBot.sqlite')

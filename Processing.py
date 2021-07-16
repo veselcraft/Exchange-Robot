@@ -1,6 +1,9 @@
-from DBH import GetListOfCurrencies
+from DBH import GetAllCurrencies, GetExchangeRates, GetListOfCrypto, GetListOfCurrencies, GetListOfFlags
+import GetExchangeRates
 
 ListOfCur = []
+ListOfCrypto = []
+DictOfFlags = []
 ListEntry = []
 ListEqual = []
 
@@ -8,14 +11,8 @@ _eng_chars = u"`qwertyuiop[]asdfghjkl;'zxcvbnm,.QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM,
 _rus_chars = u"ёйцукенгшщзхъфывапролджэячсмитьбюЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ"
 _ukr_chars = u"'йцукенгшщзхїфівапролджєячсмитьбюЙЦУКЕНГШЩЗХЇФІВАПРОЛДЖЄЯЧСМИТЬБЮ"
 
-_spec_symbols = u"~!@#$%^&*()_+-=|/.,?>\<№"
-
-def GetCur(num):
-    global ListOfCur
-    return ListOfCur[num]
-
 def SpecialSplit(MesTxt):
-    MesTxt = MesTxt.replace("\n", ". ") # Replace hyphenation with dot
+    MesTxt = MesTxt.replace("\n", " , ") # Replace hyphenation with dot
 
     while MesTxt.find("  ") != -1: # Removing double spaces
         MesTxt = MesTxt.replace("  ", " ")
@@ -36,8 +33,15 @@ def SpecialSplit(MesTxt):
         elif i == len(MesTxt) - 1:
             end = len(MesTxt)
             a.append(MesTxt[start:end])
-        #elif not MesTxt[i].isdigit() and MesTxt[i + 1] == "." or not MesTxt[i].isdigit() and MesTxt[i + 1] == "/": #separating letters from symbols
-        elif not MesTxt[i].isdigit() and MesTxt[i + 1] in _spec_symbols: #separating letters from symbols
+        elif MesTxt[i].isalpha() and not MesTxt[i + 1].isalpha() and not MesTxt[i + 1].isdigit(): #separating letters from symbols
+            end = i + 1
+            a.append(MesTxt[start:end])
+            start = end
+        elif MesTxt[i + 1].isalpha() and not MesTxt[i].isalpha() and not MesTxt[i].isdigit(): #separating symbols from letters
+            end = i + 1
+            a.append(MesTxt[start:end])
+            start = end
+        elif not MesTxt[i].isalpha() and not MesTxt[i].isdigit() and not MesTxt[i + 1].isalpha() and not MesTxt[i + 1].isdigit(): #separating symbols from letters
             end = i + 1
             a.append(MesTxt[start:end])
             start = end
@@ -58,6 +62,14 @@ def SpecialSplit(MesTxt):
 def LoadCurrencies():
     global ListOfCur
     ListOfCur = GetListOfCurrencies()
+
+def LoadCrypto():
+    global ListOfCrypto
+    ListOfCrypto = GetListOfCrypto()
+
+def LoadFlags():
+    global DictOfFlags
+    DictOfFlags = GetListOfFlags()
 
 def LoadDictionaries():
     global ListEntry
@@ -124,6 +136,45 @@ def LoadDictionaries():
         else:
             ListEqual[i] = [ListEqual[i]]
         ListEqual[i][len(ListEqual[i]) - 1] = ListEqual[i][len(ListEqual[i]) - 1].replace("\n", "")
+    for i in range(len(ListEqual)):
+        if ListEqual[i] == ['']:
+            pass
+        else:
+            for j in range(len(ListEqual[i])):
+                word = ListEqual[i][j]
+                if word[0] in _eng_chars:
+                    newRUword = ''
+                    newUAword = ''
+                    for k in range(len(word)):
+                        index = _eng_chars.find(word[k])
+                        newRUword += _rus_chars[index]
+                        newUAword += _ukr_chars[index]
+                    if newRUword not in ListEqual[i]:
+                        ListEqual[i].append(newRUword)
+                    if newUAword not in ListEqual[i]:
+                        ListEqual[i].append(newUAword)
+                elif word[0] in _rus_chars:
+                    newENword = ''
+                    newUAword = ''
+                    for k in range(len(word)):
+                        index = _rus_chars.find(word[k])
+                        newENword += _eng_chars[index]
+                        newUAword += _ukr_chars[index]
+                    if newENword not in ListEqual[i]:
+                        ListEqual[i].append(newENword)
+                    if newUAword not in ListEqual[i]:
+                        ListEqual[i].append(newUAword)
+                elif word[0] in _ukr_chars:
+                    newENword = ''
+                    newRUword = ''
+                    for k in range(len(word)):
+                        index = _ukr_chars.find(word[k])
+                        newENword += _eng_chars[index]
+                        newRUword += _rus_chars[index]
+                    if newENword not in ListEqual[i]:
+                        ListEqual[i].append(newENword)
+                    if newRUword not in ListEqual[i]:    
+                        ListEqual[i].append(newRUword)
 
 def SearchValuesAndCurrencies(arr):
     Indexes = [] #содержит индексы местонахождения
@@ -172,8 +223,9 @@ def SearchValuesAndCurrencies(arr):
                     elif u == 0 and arr[u + 1][0].isdigit():
                         Indexes.append(u)
                         CurNumber.append(i)
-                if len(Indexes)>=50:
-                    return [[],[]]
+
+                """ if len(Indexes)>=50:
+                    return [[],[]] """
             j += 1
         i += 1
         j = 0
@@ -182,21 +234,29 @@ def SearchValuesAndCurrencies(arr):
     i = 0
     while i <= len(Indexes) - 1:
         e = Indexes[i]
-        if e == 0 and arr[len(arr) + 1][0].isdigit():
-            suma.append(arr[e - 1])
+        if e == 0 and arr[1][0].isdigit():
+            suma.append(arr[e + 1])
         elif arr[e - 1][0].isdigit():
             suma.append(arr[e - 1])
         elif arr[e + 1][0].isdigit():
             suma.append(arr[e + 1])
         i += 1
     answ_ar = [suma, CurNumber]
+
+    n = len(answ_ar[0])
+    i = 0
+    while i < n:
+        for j in range(len(answ_ar[0])):
+            if answ_ar[1][i] == answ_ar[1][j] and answ_ar[0][i] == answ_ar[0][j] and j != i:
+                answ_ar[0].pop(j)
+                answ_ar[1].pop(j)
+                j -= 1
+                n -= 1
+                break
+        i += 1
     return answ_ar
 
 def TextToDigit(b):
-    """ for i in range(len(b)):
-        if b[i] in RUdict:
-            b[i] = RUdict[b[i]] """
-
     i = len(b) - 1
     while i > 0:
         if (b[i] == "к" or b[i] == "k" or "тыс" in b[i] or "тис" in b[i] or "thousand" in b[i]) and b[i - 1][0].isdigit(): #2.5к = 2500
@@ -211,3 +271,34 @@ def TextToDigit(b):
         i -= 1
     return b
     
+def AnswerText(Arr, chatID):
+    global DictOfFlags
+    global ListOfCur
+
+    answer = ''
+    for i in range(len(Arr[1])):
+        answer += "\n" + "======" + "\n"
+        CurVault = float(Arr[0][i])
+        CurCurrency = ListOfCur[Arr[1][i]]
+        PartOfAnswer = DictOfFlags[CurCurrency] + str(CurVault) + " " + CurCurrency + "\n"
+
+        ListOfChatCurrencies = GetAllCurrencies(chatID)
+        for j in ListOfChatCurrencies:
+            if CurCurrency == j:
+                pass
+            elif j == 'EUR':
+                Vault = round(CurVault / GetExchangeRates.exchangeRates[CurCurrency], 2)
+                Vault = f'{Vault:,}'.replace(","," ")
+                PartOfAnswer += "\n" + DictOfFlags[j] + str(Vault) + " EUR"
+            elif j != 'EUR':
+                Vault = round(CurVault * (GetExchangeRates.exchangeRates[j] / GetExchangeRates.exchangeRates[CurCurrency]), 2)
+                Vault = f'{Vault:,}'.replace(","," ")
+                PartOfAnswer += "\n" + DictOfFlags[j] + str(Vault) + " " + j
+        if CurCurrency == 'UAH' and CurVault == 40.0:
+            PartOfAnswer += "\n👖1 штаны"
+        elif CurCurrency == 'USD' and CurVault == 300.0:
+            PartOfAnswer += "\n🤛1"
+
+        answer += PartOfAnswer + "\n"
+
+    return answer

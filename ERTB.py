@@ -12,9 +12,9 @@ import sys
 import DBH
 from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
-from GetExchangeRates import SheduleUpdate, UpdateExchangeRates
+from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate 
 from BlackList import IsUserInBlackList, LoadBlackList
-from Processing import LoadCurrencies, LoadDictionaries, SearchValuesAndCurrencies, SpecialSplit, TextToDigit, GetCur
+from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit
 
 # Main variables
 bot = Bot(token=botToken)
@@ -48,7 +48,7 @@ async def WrongMes(message: types.Message):
 # Admin`s commands
 @dp.message_handler(commands=['echo'])
 async def EchoVoid(message: types.Message):
-    pass
+    await message.reply(message.text)
 
 
 @dp.message_handler(commands=['numberofusers'])  # Analog of "count".
@@ -124,25 +124,33 @@ async def MainVoid(message: types.Message):
     if not any(map(str.isdigit, MessageText)):
         return
 
+    # Preparing a message for searching currencies
     MessageText = MessageText.lower()
     TextArray = SpecialSplit(MessageText)
     Print(TextArray)
 
-    # поиск валют, если их нет, то возврат обратно, если есть, то продолжить
-
+    # '5kk USD' to '5000000 USD'
     TextArray = TextToDigit(TextArray)
     Print(TextArray)
-
+    
+    # Searching Currencies
     NumArray = SearchValuesAndCurrencies(TextArray)
     Print(NumArray)
 
-    textMes = ''
+    # If there are no currencies, then work is interrupted
+    if NumArray == [[],[]]:
+        return
+
+    result = AnswerText(NumArray, message.chat.id)
+    print(result)
+    await message.reply("1")
+
+    """ textMes = ''
     for i in range(len(NumArray[0])):
         NumArray[1][i] = GetCur(NumArray[1][i])
         textMes += NumArray[0][i] + " " + NumArray[1][i] + "\n"
 
-    await message.reply(textMes)
-
+    await message.reply(textMes) """
 
 def CheckArgument(key, value):
     isAllOkArg = True
@@ -174,7 +182,9 @@ def CheckArgument(key, value):
 def LoadDataForBot():
     DBH.DbIntegrityCheck()
     LoadBlackList()
-    """ LoadCurrencies() """
+    LoadCurrencies()
+    LoadCrypto()
+    LoadFlags()
     LoadDictionaries()
 
 
@@ -200,6 +210,8 @@ if __name__ == '__main__':
         print("Error. Duplicate argument.")
         sys.exit()
 
-    # ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)
-    # ThreadUpdateExchangeRates.start()
+    ThreadUpdateExchangeRates = Thread(target=SheduleUpdate)
+    ThreadUpdateExchangeRates.start()
+    ThreadUpdateCryptoRates = Thread(target=SheduleCryptoUpdate)
+    ThreadUpdateCryptoRates.start()
     executor.start_polling(dp, skip_updates=IsUpdate())
