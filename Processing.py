@@ -16,7 +16,7 @@ _eng_chars = u"`qwertyuiop[]asdfghjkl;'zxcvbnm,.QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM,
 _rus_chars = u"ёйцукенгшщзхъфывапролджэячсмитьбюЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ"
 _ukr_chars = u"'йцукенгшщзхїфівапролджєячсмитьбюЙЦУКЕНГШЩЗХЇФІВАПРОЛДЖЄЯЧСМИТЬБЮ"
 
-def SpecialSplit(MesTxt):
+def SpecialSplit(MesTxt: str) -> list:
     MesTxt = MesTxt.replace("\n", " , ") # Replace hyphenation with dot
 
     while MesTxt.find("  ") != -1: # Removing double spaces
@@ -282,7 +282,7 @@ def LoadDictionaries():
                     if newRUword not in ListCryptoEqual[i]:    
                         ListCryptoEqual[i].append(newRUword)
 
-def SearchValuesAndCurrencies(arr):
+def SearchValuesAndCurrencies(arr: list) -> list:
     Values = [] #содержит суммы
     CurNumber = [] #содержит номера валют
     CryptoValues = [] #сожержит суммы
@@ -438,7 +438,7 @@ def SearchValuesAndCurrencies(arr):
         i += 1
     return answ_ar
 
-def TextToDigit(b):
+def TextToDigit(b: list) -> list:
     i = len(b) - 1
     while i > 0:
         if (b[i] == "к" or b[i] == "k" or "тыс" in b[i] or "тис" in b[i] or "thousand" in b[i]) and b[i - 1][0].isdigit(): #2.5к = 2500
@@ -453,7 +453,7 @@ def TextToDigit(b):
         i -= 1
     return b
     
-def AnswerText(Arr, chatID):
+def AnswerText(Arr: list, chatID: str) -> str:
     global DictOfFlags
     global ListOfCur
     global ListOfCrypto

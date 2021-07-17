@@ -23,7 +23,7 @@ def SheduleCryptoUpdate():
         cryptoRates = UpdateCryptoRates()
         time.sleep(14400)
 
-def UpdateExchangeRates():
+def UpdateExchangeRates() -> dict:
     global exchangeRates
     Print("Updating of exchange rates has started.", "S")
     try:
@@ -39,7 +39,7 @@ def UpdateExchangeRates():
         exchangeRates = GetExchangeRates()
     return exchangeRates.copy()
 
-def UpdateCryptoRates():
+def UpdateCryptoRates() -> dict:
     global cryptoRates
     Print("Updating of crypto rates has started.", "S")
     try:

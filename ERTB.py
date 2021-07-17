@@ -142,7 +142,7 @@ async def MainVoid(message: types.Message):
     result = AnswerText(NumArray, message.chat.id)
     await message.reply(result)
 
-def CheckArgument(key, value):
+def CheckArgument(key: str, value: str) -> bool:
     isAllOkArg = True
     if key == "--logs" or key == "-l":
         if value == "on":

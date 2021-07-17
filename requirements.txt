@@ -4,3 +4,4 @@ ujson
 cchardet
 aiodns
 aiohttp[speedups]
+pymorphy2

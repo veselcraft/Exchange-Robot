@@ -1,0 +1,9 @@
+ERTB – exchange rates telegram bot.
+
+Bot is able to detect values and currencies in text and convert them into the proper currencies. This bot is open source and distributed under the MIT license. License text: https://github.com/volkovskey/exchange-rates-tg-bot/blob/master/LICENSE.
+
+Current version: 2.0 Alpha
+
+Creators: @volkovskey и @vladikko
+
+Contacts for partnership: business@ertb.net

@@ -582,7 +582,7 @@ def CreateDataBaseTemplate():
     con.close()
     Print("Main DB is created.", "S")
 
-def AddID(chatID, chatType):
+def AddID(chatID: str, chatType: str):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
@@ -595,7 +595,7 @@ def AddID(chatID, chatType):
     con.commit()
 
 
-def SetSetting(chatID, key, val, chatType):
+def SetSetting(chatID: str, key: str, val: str, chatType: str):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
@@ -608,7 +608,7 @@ def SetSetting(chatID, key, val, chatType):
     except:
         Print("No such column.", "E")
 
-def SetCurrencySetting(chatID, currency, val):
+def SetCurrencySetting(chatID: str, currency: str, val: str):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
@@ -618,7 +618,7 @@ def SetCurrencySetting(chatID, currency, val):
     except:
         Print("No such column.", "E")
 
-def SetCryptoSetting(chatID, crypto, val):
+def SetCryptoSetting(chatID: str, crypto: str, val: str):
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
@@ -628,7 +628,7 @@ def SetCryptoSetting(chatID, crypto, val):
     except:
         Print("No such column.", "E")
 
-def GetAllSettings(chatID, chatType):
+def GetAllSettings(chatID: str, chatType: str) -> dict:
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     con.row_factory = sql.Row
@@ -645,7 +645,7 @@ def GetAllSettings(chatID, chatType):
         Print("No such chatID.", "E")
         return None
 
-def GetSetting(chatID,key,chatType):
+def GetSetting(chatID: str, key: str, chatType: str) -> str:
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
@@ -661,7 +661,7 @@ def GetSetting(chatID,key,chatType):
         Print("No such column.", "E")
         return None
 
-def GetAllCurrencies(chatID):
+def GetAllCurrencies(chatID: str) -> list:
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     con.row_factory = sql.Row
@@ -674,7 +674,7 @@ def GetAllCurrencies(chatID):
         Print("No such chatID.", "E")
         return None
 
-def GetAllCrypto(chatID):
+def GetAllCrypto(chatID: str) -> list:
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     con.row_factory = sql.Row
@@ -687,7 +687,7 @@ def GetAllCrypto(chatID):
         Print("No such chatID.", "E")
         return None
 
-def ChatExists(chatID):
+def ChatExists(chatID: str) -> int:
     chatID = int(chatID)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
@@ -695,7 +695,7 @@ def ChatExists(chatID):
     res = cursor.fetchone()
     return res[0]
 
-def IsBlacklisted(userID):
+def IsBlacklisted(userID: str) -> int:
     userID = int(userID)
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
@@ -703,7 +703,7 @@ def IsBlacklisted(userID):
     res = cursor.fetchone()
     return res[0]
 
-def ClearBlacklist(userID):
+def ClearBlacklist(userID: str):
     userID = int(userID)
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
@@ -722,28 +722,28 @@ def ClearBlacklist(userID):
             Print("No such userID.", "E")
             return None
  
-def AddBlacklist(userID,chatID=0,chatName=""):
+def AddBlacklist(userID: str,chatID: str = 0,chatName: str = ""):
     chatID = int(chatID)
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
     cursor.execute("INSERT OR IGNORE INTO BlackList (userID,chatID,chatName,banDate) values (?,?,?,DATETIME())",tuple([userID,chatID,chatName]))
     con.commit()
 
-def GetBlacklist():
+def GetBlacklist() -> list:
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
     cursor.execute("SELECT * from BlackList")
     res = cursor.fetchall()
     return [k[0] for k in res]
 
-def GetAdmins():
+def GetAdmins() -> list:
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
     cursor.execute("SELECT * from AdminsList")
     res = cursor.fetchall()
     return [k[0] for k in res]
 
-def IsAdmin(adminID):
+def IsAdmin(adminID: str) -> int:
     adminID = int(adminID)
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
@@ -751,14 +751,14 @@ def IsAdmin(adminID):
     res = cursor.fetchone()
     return res[0]
 
-def AddAdmin(adminID):
+def AddAdmin(adminID: str):
     adminID = int(adminID)
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
     cursor.execute("INSERT OR IGNORE INTO AdminsList (adminID) values ("+str(adminID)+")")
     con.commit()
 
-def ClearAdmins(adminID):
+def ClearAdmins(adminID: str):
     adminID = int(adminID)
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
@@ -775,21 +775,21 @@ def ClearAdmins(adminID):
             Print("No such adminID.", "E")
             return None
 
-def GetListOfCurrencies():
+def GetListOfCurrencies() -> list:
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.execute("SELECT * FROM SettingsExchangeRates")
     names = [description[0] for description in cursor.description]
     names.pop(0)
     return [i[1:] for i in names]
 
-def GetListOfCrypto():
+def GetListOfCrypto() -> list:
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.execute("SELECT * FROM SettingsCryptoRates")
     names = [description[0] for description in cursor.description]
     names.pop(0)
     return [i[0:] for i in names]
 
-def UpdateExchangeRatesDB(exchangeRates):
+def UpdateExchangeRatesDB(exchangeRates: dict):
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     f = open("Dictionaries/currencies.json",encoding="utf-8")
@@ -802,7 +802,7 @@ def UpdateExchangeRatesDB(exchangeRates):
             continue
     con.commit()
 
-def UpdateCryptoRatesDB(cryptoRates):
+def UpdateCryptoRatesDB(cryptoRates: dict):
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     f = open("Dictionaries/currencies.json",encoding="utf-8")
@@ -811,19 +811,19 @@ def UpdateCryptoRatesDB(cryptoRates):
         cursor.execute("INSERT OR REPLACE INTO CryptoRates (currency,flag,exchangeRates) values ('"+cur[:-4]+"','"+""+"',?)",tuple([rate]))
     con.commit()
 
-def AddIDStats(chatID,chatType):
+def AddIDStats(chatID: str, chatType: str):
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
     cursor.execute("INSERT OR IGNORE INTO ChatsUsage (chatID, chatType, timeAdded, lastTimeUse) values ("+str(chatID)+",'"+chatType+"',DATETIME(),DATETIME())")
     con.commit()
 
-def UpdateChatUsage(chatID):
+def UpdateChatUsage(chatID: str):
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
     cursor.execute("UPDATE ChatsUsage SET lastTimeUse = DATETIME() WHERE chatID = "+str(chatID))
     con.commit()
 
-def GetChatsAmount():
+def GetChatsAmount() -> dict:
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
     cursor.execute("SELECT COUNT(*) FROM ChatsUsage WHERE chatType = 'private'")
@@ -833,7 +833,7 @@ def GetChatsAmount():
     res['groups']=cursor.fetchone()[0]
     return res
 
-def GetTimeStats():
+def GetTimeStats() -> dict:
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
     cursor.execute("SELECT COUNT(*) FROM ChatsUsage WHERE chatType = 'private'")
@@ -853,11 +853,12 @@ def GetTimeStats():
     con.commit()
     return res
 
-def ProcessedCurrency(chatID, userID, processedCurrency, message, turnedOnCurrencies):
+def ProcessedCurrency(chatID: str, userID: str, processedCurrency: str, message: str):
     values_q = [chatID, userID, processedCurrency, message]
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
     query = "INSERT INTO ProcessedCurrencies (date, chatID, userID, proccesedCurrency ,message"
+    turnedOnCurrencies = GetAllCurrencies(chatID) + GetAllCrypto(chatID)
     for cur in turnedOnCurrencies:
         query = query +", _"+ cur
         values_q.append(1)
@@ -868,7 +869,7 @@ def ProcessedCurrency(chatID, userID, processedCurrency, message, turnedOnCurren
     cursor.execute(query,tuple(values_q))
     con.commit()
 
-def GetListOfFlags():
+def GetListOfFlags() -> list:
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     cursor.execute("SELECT * FROM ExchangeRates")
@@ -878,7 +879,7 @@ def GetListOfFlags():
         res_dict[i[0]]=i[1]
     return res_dict
 
-def GetExchangeRates():
+def GetExchangeRates() -> dict:
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     cursor.execute("SELECT * FROM ExchangeRates")
@@ -888,7 +889,7 @@ def GetExchangeRates():
         res_dict[i[0]]=i[2]
     return res_dict
 
-def GetCryptoRates():
+def GetCryptoRates() -> dict:
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     cursor.execute("SELECT * FROM CryptoRates")
@@ -898,7 +899,7 @@ def GetCryptoRates():
         res_dict[i[0]]=i[2]
     return res_dict
 
-def GetStatsInPeriod(days):
+def GetStatsInPeriod(days: int) -> dict:
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
     res = {}
@@ -908,7 +909,7 @@ def GetStatsInPeriod(days):
     res['activeGroups'] = cursor.fetchone()[0]
     return res
 
-def AddReport(chatID, userID, message, reply=""):
+def AddReport(chatID: str, userID: str, message: str, reply: str = ""):
     con = sql.connect('DataBases/ServiceData.sqlite')
     cursor = con.cursor()
     cursor.execute("INSERT INTO Reports (date,chatID,userID,message,reply) values (DATETIME(),?,?,?,?)",tuple([chatID,userID,message,reply]))

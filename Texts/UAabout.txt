@@ -1,0 +1,9 @@
+ERTB – exchange rates telegram bot.
+
+Бот створенний для розпізнавання в тексті пар чисел та валют з подальшим переводом їх в інші валюти за актуальними курсам. Початковий код розповсюджується за ліцензією MIT. Текст ліцензії: https://github.com/volkovskey/exchange-rates-tg-bot/blob/master/LICENSE.
+
+Поточна версія: 2.0 Alpha
+
+Автори: @volkovskey и @vladikko
+
+Для співпраці: business@ertb.net
