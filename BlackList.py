@@ -3,6 +3,7 @@ import DBH
 BlackList = []
 
 def IsUserInBlackList(userID: str) -> bool:
+    global BlackList
     if userID in BlackList:
         return True
     else:
@@ -10,7 +11,7 @@ def IsUserInBlackList(userID: str) -> bool:
 
 def LoadBlackList():
     global BlackList
-    BlackList = DBH.GetBlacklist
+    BlackList = DBH.GetBlacklist()
 
 def AddToBlackList(userID: str, chatID: str, chatName: str):
     if userID not in BlackList:

@@ -292,7 +292,7 @@ def SearchValuesAndCurrencies(arr: list) -> list:
     while i < len(ListEntry):
         while j < len(ListEntry[i]):
             for u in range(len(arr)):
-                if u != len(arr) - 1 and (arr[u] + " " + arr[u + 1]).find(ListEntry[i][j]) == 0 and ListEntry[i] != ['']:
+                if u != len(arr) - 1 and (arr[u] + " " + arr[u + 1]).find(ListEntry[i][j]) == 0 and ListEntry[i] != [''] and ListEntry[i][j].find(' ') != -1:
                     if u <= len(arr) - 3 and u != 0:
                         if arr[u + 2][0].isdigit():
                             Values.append(arr[u + 2])

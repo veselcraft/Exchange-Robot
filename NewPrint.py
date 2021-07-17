@@ -7,18 +7,18 @@ counterS = 0
 counterL = 0
 counterE = 0
 
-def Print(printingText: str, status: str):
+def Print(printingText: str, status: str = ""):
     global counterS, counterL, counterE
     if consoleLog:
         status = status.lower()
         if status == 's':
-            print("Service " + str(counterS) + ": " + printingText)
+            print("\033[36m{} ".format("Service") + "\033[37m{}".format(str(counterS)) + ": "+ printingText)
             counterS += 1
         elif status == 'e':
             print("\033[31m{} ".format("Error") + "\033[37m{}".format(str(counterE)) + ": "+ printingText)
             counterE += 1
         elif status == 'l':
-            print("Log " + str(counterL) + ": " + printingText)
+            print("\033[32m{} ".format("Log") + "\033[37m{}".format(str(counterL)) + ": "+ printingText)
             counterL += 1
         elif status == '':
             print(printingText)

@@ -7,14 +7,18 @@ from aiogram.types.message import ContentType
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from threading import Thread
 import sys
+from datetime import datetime
 
 # Own libraries
 import DBH
+from Numberize import replace_numerals_by_numbers as w2n
 from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate 
 from BlackList import IsUserInBlackList, LoadBlackList
 from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit
+from TextHelper import LoadTexts
+from TextHelper import GetText as GT
 
 # Main variables
 bot = Bot(token=botToken)
@@ -23,8 +27,9 @@ dp = Dispatcher(bot)
 # Public commands
 @dp.message_handler(commands=['about'])  # analog about and source
 async def AboutMes(message: types.Message):
-    pass
-
+    if IsUserInBlackList(message.from_user.id):
+        return
+    await message.reply(GT(message.chat.id, "about", message.chat.type))
 
 @dp.message_handler(commands=['help'])
 async def HelpMes(message: types.Message):
@@ -118,12 +123,15 @@ async def MainVoid(message: types.Message):
     else:
         DBH.AddID(message.chat.id, message.chat.type)
 
+    # word to num
+    MessageText = MessageText.lower()
+    """ Print(MessageText, "L") """
+
     # Check digit
     if not any(map(str.isdigit, MessageText)):
         return
 
     # Preparing a message for searching currencies
-    MessageText = MessageText.lower()
     TextArray = SpecialSplit(MessageText)
     Print(str(TextArray), "L")
 
@@ -141,6 +149,7 @@ async def MainVoid(message: types.Message):
 
     result = AnswerText(NumArray, message.chat.id)
     await message.reply(result)
+    now = datetime.now()
 
 def CheckArgument(key: str, value: str) -> bool:
     isAllOkArg = True
@@ -176,6 +185,7 @@ def LoadDataForBot():
     LoadCrypto()
     LoadFlags()
     LoadDictionaries()
+    LoadTexts()
 
 
 if __name__ == '__main__':
