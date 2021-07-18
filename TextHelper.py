@@ -30,6 +30,5 @@ def LoadTexts():
 
 def GetText(chatID: str, nameOfText: str, chatType: str) -> str:
     lang = DBH.GetSetting(chatID, "lang", chatType)
-    Print(lang, "E")
     dictLang = AllTexts[lang]
     return dictLang[nameOfText]

@@ -11,7 +11,7 @@ from datetime import datetime
 
 # Own libraries
 import DBH
-from Numberize import replace_numerals_by_numbers as w2n
+from w2n.Numberize import replace_numerals_by_numbers as w2n
 from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate 
@@ -125,7 +125,8 @@ async def MainVoid(message: types.Message):
 
     # word to num
     MessageText = MessageText.lower()
-    """ Print(MessageText, "L") """
+    MessageText = w2n(MessageText)
+    Print(MessageText, "L")
 
     # Check digit
     if not any(map(str.isdigit, MessageText)):
@@ -149,7 +150,6 @@ async def MainVoid(message: types.Message):
 
     result = AnswerText(NumArray, message.chat.id)
     await message.reply(result)
-    now = datetime.now()
 
 def CheckArgument(key: str, value: str) -> bool:
     isAllOkArg = True
