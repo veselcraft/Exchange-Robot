@@ -279,20 +279,20 @@ def CreateStatsDataBase():
                 _ZAR INTEGER DEFAULT 0,
                 _ZMW INTEGER DEFAULT 0,
                 _ZWL INTEGER DEFAULT 0,
-                ADA INTEGER DEFAULT 0,
-                BCH INTEGER DEFAULT 0,
-                BNB INTEGER DEFAULT 0,
-                BTC INTEGER DEFAULT 0,
-                DASH INTEGER DEFAULT 0,
-                DOGE INTEGER DEFAULT 0,
-                ETC INTEGER DEFAULT 0,
-                ETH INTEGER DEFAULT 0,
-                LTC INTEGER DEFAULT 0,
-                RVN INTEGER DEFAULT 0,
-                TRX INTEGER DEFAULT 0,
-                XLM INTEGER DEFAULT 0,
-                XMR INTEGER DEFAULT 0,
-                XRP INTEGER DEFAULT 0
+                _ADA INTEGER DEFAULT 0,
+                _BCH INTEGER DEFAULT 0,
+                _BNB INTEGER DEFAULT 0,
+                _BTC INTEGER DEFAULT 0,
+                _DASH INTEGER DEFAULT 0,
+                _DOGE INTEGER DEFAULT 0,
+                _ETC INTEGER DEFAULT 0,
+                _ETH INTEGER DEFAULT 0,
+                _LTC INTEGER DEFAULT 0,
+                _RVN INTEGER DEFAULT 0,
+                _TRX INTEGER DEFAULT 0,
+                _XLM INTEGER DEFAULT 0,
+                _XMR INTEGER DEFAULT 0,
+                _XRP INTEGER DEFAULT 0
             );
         """)
 
@@ -917,6 +917,10 @@ def ProcessedCurrency(chatID: str, userID: str, processedCurrency: str, message:
     cursor = con.cursor()
     query = "INSERT INTO ProcessedCurrencies (date, chatID, userID, proccesedCurrency ,message"
     turnedOnCurrencies = GetAllCurrencies(chatID) + GetAllCrypto(chatID)
+    try:
+        turnedOnCurrencies.remove(processedCurrency)
+    except:
+        pass
     for cur in turnedOnCurrencies:
         query = query + ", _" + cur
         values_q.append(1)
@@ -928,7 +932,7 @@ def ProcessedCurrency(chatID: str, userID: str, processedCurrency: str, message:
     con.commit()
 
 
-def GetListOfFlags() -> list:
+def GetDictOfFlags() -> dict:
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
     cursor.execute("SELECT * FROM ExchangeRates")

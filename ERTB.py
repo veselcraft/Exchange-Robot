@@ -16,7 +16,8 @@ from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate 
 from BlackList import IsUserInBlackList, LoadBlackList
-from Processing import AnswerText, ListCryptoEntry, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit
+import Processing
+from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit
 import TextHelper as CustomMarkup
 from TextHelper import LoadTexts, GetText
 
@@ -146,6 +147,7 @@ async def MainVoid(message: types.Message):
     IsChatExist(message.chat.id, message.chat.type)
 
     # word to num
+    OriginalMessageText = MessageText
     MessageText = MessageText.lower()
     MessageText = w2n(MessageText)
     Print(MessageText, "L")
@@ -170,8 +172,12 @@ async def MainVoid(message: types.Message):
     if NumArray == [[],[],[],[]]:
         return
 
-    result = AnswerText(NumArray, message.chat.id)
+    result = AnswerText(NumArray, message.chat.id, message.chat.type)
     await message.reply(result, reply_markup = CustomMarkup.DeleteMarkup(message.chat.id, message.chat.type))
+    for i in NumArray[1]:
+        DBH.ProcessedCurrency(message.chat.id, message.from_user.id, Processing.ListOfCur[i], OriginalMessageText)
+    for i in NumArray[3]:
+        DBH.ProcessedCurrency(message.chat.id, message.from_user.id, Processing.ListOfCrypto[i], OriginalMessageText)
 
 def CheckArgument(key: str, value: str) -> bool:
     isAllOkArg = True
