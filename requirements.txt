@@ -1,7 +1,8 @@
-aiogram
-uvloop
-ujson
-cchardet
-aiodns
-aiohttp[speedups]
-pymorphy2
+aiogram==2.14.3
+uvloop==0.15.3
+ujson==4.0.2
+cchardet==2.1.7
+aiodns==3.0.0
+aiohttp[speedups]==3.7.4.post0
+pymorphy2==0.9.1
+Numberize==0.0.3

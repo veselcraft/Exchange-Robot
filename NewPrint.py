@@ -8,6 +8,7 @@ counterL = 0
 counterE = 0
 
 def Print(printingText: str, status: str = ""):
+    printingText = str(printingText)
     global counterS, counterL, counterE
     if consoleLog:
         status = status.lower()

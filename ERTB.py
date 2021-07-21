@@ -5,20 +5,20 @@ from Token import botToken
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types.message import ContentType
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
+from numberize import numberizer
 from threading import Thread
 import sys
 from datetime import datetime
 
 # Own libraries
 import DBH
-from w2n.Numberize import replace_numerals_by_numbers as w2n
 from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate 
 from BlackList import IsUserInBlackList, LoadBlackList
-from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit
-from TextHelper import LoadTexts
-from TextHelper import GetText as GT
+from Processing import AnswerText, ListCryptoEntry, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit
+import TextHelper as CustomMarkup
+from TextHelper import LoadTexts, GetText
 
 # Main variables
 bot = Bot(token=botToken)
@@ -29,11 +29,15 @@ dp = Dispatcher(bot)
 async def AboutMes(message: types.Message):
     if IsUserInBlackList(message.from_user.id):
         return
-    await message.reply(GT(message.chat.id, "about", message.chat.type))
+    IsChatExist(message.chat.id, message.chat.type)
+    await message.reply(GetText(message.chat.id, "about", message.chat.type), reply_markup = CustomMarkup.DeleteMarkup(message.chat.id, message.chat.type))
 
 @dp.message_handler(commands=['help'])
 async def HelpMes(message: types.Message):
-    pass
+    if IsUserInBlackList(message.from_user.id):
+        return
+    IsChatExist(message.chat.id, message.chat.type)
+    await message.reply(GetText(message.chat.id, "help", message.chat.type), reply_markup = CustomMarkup.DeleteMarkup(message.chat.id, message.chat.type))
 
 
 @dp.message_handler(commands=['settings'])
@@ -43,7 +47,10 @@ async def SettingsMes(message: types.Message):
 
 @dp.message_handler(commands=['donate'])
 async def DonateMes(message: types.Message):
-    pass
+    if IsUserInBlackList(message.from_user.id):
+        return
+    IsChatExist(message.chat.id, message.chat.type)
+    await message.reply(GetText(message.chat.id, "donate", message.chat.type), reply_markup = CustomMarkup.DonateMarkup(message.chat.id, message.chat.type))
 
 
 @dp.message_handler(commands=['wrong'])
@@ -60,8 +67,7 @@ async def EchoVoid(message: types.Message):
 async def CountVoid(message: types.Message):
     pass
 
-
-@dp.message_handler(commands=['newadmin'])
+@dp.message_handler(commands=['newadmin']) 
 async def AddAdminVoid(message: types.Message):
     if IsUserInBlackList(message.from_user.id):
         return
@@ -71,6 +77,15 @@ async def AddAdminVoid(message: types.Message):
         if newAdminID.isdigit():
             if not DBH.IsAdmin(newAdminID):
                 DBH.AddAdmin(newAdminID)
+                ListOfAdmins = DBH.GetAdmins()
+                if newAdminID in ListOfAdmins:
+                    message.reply("Новый администратор успешно добавлен.", CustomMarkup.GetText(message.chat.id, 'delete', message.chat.type))
+                else:
+                    message.reply("Не удалось добавить нового администратора.", CustomMarkup.GetText(message.chat.id, 'delete', message.chat.type))
+            else:
+                message.reply("Данный ID уже есть в списке администраторов.", CustomMarkup.GetText(message.chat.id, 'delete', message.chat.type))
+        else:
+            message.reply("В ID должны быть только цифры и минус.", CustomMarkup.GetText(message.chat.id, 'delete', message.chat.type))
 
 
 @dp.message_handler(commands=['stats'])
@@ -82,7 +97,6 @@ async def StatsVoid(message: types.Message):
 async def BackupVoid(message: types.Message):
     pass
 
-
 @dp.message_handler(commands=['unban'])
 async def UnbanVoid(message: types.Message):
     if IsUserInBlackList(message.from_user.id):
@@ -93,16 +107,27 @@ async def UnbanVoid(message: types.Message):
         if unbanID.isdigit():
             if DBH.IsBlacklisted(unbanID):
                 DBH.ClearBlacklist(unbanID)
+                if not DBH.IsBlacklisted(unbanID):
+                    message.reply("Пользователь успешно разблокирован.", CustomMarkup.GetText(message.chat.id, 'delete', message.chat.type))
+                else:
+                    message.reply("Не удалось разблокировать пользователя.", CustomMarkup.GetText(message.chat.id, 'delete', message.chat.type))
+            else:
+                message.reply("Данный пользователь не находится в ЧС. Разблокировка не возможна.", CustomMarkup.GetText(message.chat.id, 'delete', message.chat.type))
+        else:
+            message.reply("В ID должны быть только цифры и минус.", CustomMarkup.GetText(message.chat.id, 'delete', message.chat.type))
 
 
 # Technical commands
 @dp.message_handler(commands=['start'])
 async def StartVoid(message: types.Message):
-    pass
+    IsChatExist(message.chat.ID, message.chat.type)
 
 
 @dp.message_handler(content_types=ContentType.ANY)
 async def MainVoid(message: types.Message):
+    def w2n(MesString):
+        return numberizer.replace_numerals(MesString)
+
     # Checking if a user is on the blacklist
     if IsUserInBlackList(message.from_user.id):
         return
@@ -118,10 +143,7 @@ async def MainVoid(message: types.Message):
     PrintMainInfo(message, MessageText)
 
     # Checking the chat in the database
-    if DBH.ChatExists(message.chat.id):
-        pass
-    else:
-        DBH.AddID(message.chat.id, message.chat.type)
+    IsChatExist(message.chat.id, message.chat.type)
 
     # word to num
     MessageText = MessageText.lower()
@@ -149,7 +171,7 @@ async def MainVoid(message: types.Message):
         return
 
     result = AnswerText(NumArray, message.chat.id)
-    await message.reply(result)
+    await message.reply(result, reply_markup = CustomMarkup.DeleteMarkup(message.chat.id, message.chat.type))
 
 def CheckArgument(key: str, value: str) -> bool:
     isAllOkArg = True
@@ -177,6 +199,11 @@ def CheckArgument(key: str, value: str) -> bool:
         print("Error. Unknow argument '{}'".format(key))
     return isAllOkArg
 
+def IsChatExist(chatID: str, chatType: str):
+    if DBH.ChatExists(chatID):
+        pass
+    else:
+        DBH.AddID(chatID, chatType)
 
 def LoadDataForBot():
     DBH.DbIntegrityCheck()
