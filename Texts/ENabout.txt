@@ -1,1 +1,11 @@
-Тут будет текст на английском для комманды /about.
+ERTB – exchange rates telegram bot.
+
+Bot recognizes number-currency pairs in messages and automatically converts them into outher currencies according to latest exchange rates.
+
+It's an open source project distributed under MIT license. License: https://github.com/volkovskey/exchange-rates-tg-bot/blob/master/LICENSE.
+
+Version: 2.0 Alfa
+
+Authors: @volkovskey & @vladikko
+
+Contact us: business@ertb.net
