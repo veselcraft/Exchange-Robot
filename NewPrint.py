@@ -21,6 +21,9 @@ def Print(printingText: str, status: str = ""):
         elif status == 'l':
             print("\033[32m{} ".format("Log") + "\033[37m{}".format(str(counterL)) + ": "+ printingText)
             counterL += 1
+        elif status == 'w':
+            print("\033[33m{} ".format("Warning") + "\033[37m{}".format(str(counterL)) + ": "+ printingText)
+            counterL += 1
         elif status == '':
             print(printingText)
 

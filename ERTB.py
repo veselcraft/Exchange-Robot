@@ -9,6 +9,7 @@ from numberize import numberizer
 from threading import Thread
 import sys
 from datetime import datetime
+import time
 
 # Own libraries
 import DBH
@@ -24,6 +25,7 @@ from TextHelper import LoadTexts, GetText
 # Main variables
 bot = Bot(token=botToken)
 dp = Dispatcher(bot)
+IsStartedCount = False
 
 # Public commands
 @dp.message_handler(commands=['about'])  # analog about and source
@@ -59,24 +61,69 @@ async def WrongMes(message: types.Message):
     if IsUserInBlackList(message.from_user.id):
         return
     IsChatExist(message.chat.id, message.chat.type)
-    Print(message, "L")
     MessageText = message.reply_to_message.text
     if message.photo or message.video is not None or message.document is not None:
         MessageText = message.reply_to_message.caption
-    replyMessage = message.reply_to_message
-    Print(replyMessage, "L")
     DBH.AddReport(message.chat.id, message.from_user.id, MessageText)
-
 
 # Admin`s commands
 @dp.message_handler(commands=['echo'])
 async def EchoVoid(message: types.Message):
-    await message.reply(message.text)
-
+    if IsUserInBlackList(message.from_user.id):
+        return
+    if DBH.IsAdmin(message.from_user.id):
+        MessageToUsers = (message.text).replace("/echo ", "")
+        adminList = DBH.GetAdmins()
+        for i in adminList:
+            await bot.send_message(i, "Начата рассылка сообщения всем пользователям. Текст сообщения:\n\n" + MessageToUsers, reply_markup = CustomMarkup.DeleteMarkup(i, "private"))
+        listGC = DBH.GetGroupChatIDs()
+        for i in listGC:
+            try:
+                await bot.send_message(i, MessageToUsers, reply_markup = CustomMarkup.DonateMarkup(i, "private"))
+            except:
+                Print("Chat " + str(i) + " is not available.", "W")
+            time.sleep(0.035)
+        listPC = DBH.GetPrivateChatIDs()
+        for i in listPC:
+            try:
+                await bot.send_message(i, MessageToUsers, reply_markup = CustomMarkup.DonateMarkup(i, "private"))
+            except:
+                Print("Chat " + str(i) + " is not available.", "W")
+            time.sleep(0.035)
+        for i in adminList:
+            await bot.send_message(i, "Рассылка закончена.", reply_markup = CustomMarkup.DeleteMarkup(i, "private"))
 
 @dp.message_handler(commands=['numberofusers'])  # Analog of "count".
 async def CountVoid(message: types.Message):
-    pass
+    global IsStartedCount
+    if IsUserInBlackList(message.from_user.id):
+        return
+    if DBH.IsAdmin(message.from_user.id):
+        if not IsStartedCount:
+            adminList = DBH.GetAdmins()
+            for i in adminList:
+                await bot.send_message(i, "Начат подсчёт количества пользователей.", reply_markup = CustomMarkup.DeleteMarkup(i, "private"))
+            IsStartedCount = True
+            CountUsers = 0
+            listGC = DBH.GetGroupChatIDs()
+            for i in listGC:
+                try:
+                    CountUsers += await bot.get_chat_members_count(i)
+                except:
+                    Print("Chat " + str(i) + " not found.", "W")
+                time.sleep(0.035)
+            listPC = DBH.GetPrivateChatIDs()
+            for i in listPC:
+                try:
+                    CountUsers += await bot.get_chat_members_count(i) - 1
+                except:
+                    Print("Chat " + str(i) + " not found.", "W")
+                time.sleep(0.035)
+            IsStartedCount = False
+            for i in adminList:
+                await bot.send_message(i, "Количество участников чатов: " + str(CountUsers), reply_markup = CustomMarkup.DeleteMarkup(i, "private"))
+        else:
+            await message.reply("Подсчёт уже начат.", reply_markup = CustomMarkup.DeleteMarkup(message.chat.id, message.chat.type))
 
 @dp.message_handler(commands=['newadmin']) 
 async def AddAdminVoid(message: types.Message):
@@ -106,7 +153,12 @@ async def StatsVoid(message: types.Message):
 
 @dp.message_handler(commands=['pulloutalldata']) # analog "backup", "logs" and "reports".
 async def BackupVoid(message: types.Message):
-    pass
+    if IsUserInBlackList(message.from_user.id):
+        return
+    if DBH.IsAdmin(message.from_user.id):
+        nameOfBackup = DBH.CreateAllBackups()
+        backupFile = open(nameOfBackup, 'rb')
+        await bot.send_document(message.chat.id, backupFile)
 
 @dp.message_handler(commands=['unban'])
 async def UnbanVoid(message: types.Message):
@@ -131,7 +183,7 @@ async def UnbanVoid(message: types.Message):
 # Technical commands
 @dp.message_handler(commands=['start'])
 async def StartVoid(message: types.Message):
-    IsChatExist(message.chat.ID, message.chat.type)
+    IsChatExist(message.chat.id, message.chat.type)
 
 
 @dp.message_handler(content_types=ContentType.ANY)
@@ -222,7 +274,7 @@ def IsChatExist(chatID: str, chatType: str):
         DBH.AddID(chatID, chatType)
 
 def LoadDataForBot():
-    DBH.DbIntegrityCheck()
+    DBH.DBIntegrityCheck()
     LoadBlackList()
     LoadCurrencies()
     LoadCrypto()
@@ -230,6 +282,11 @@ def LoadDataForBot():
     LoadDictionaries()
     LoadTexts()
 
+def RegularBackup():
+    while True:
+        nameOfArch = DBH.CreateAllBackups()
+        Print("Backup " + nameOfArch + " created.", "S")
+        time.sleep(86400)
 
 if __name__ == '__main__':
     LoadDataForBot()
@@ -257,4 +314,6 @@ if __name__ == '__main__':
     ThreadUpdateExchangeRates.start()
     ThreadUpdateCryptoRates = Thread(target=SheduleCryptoUpdate)
     ThreadUpdateCryptoRates.start()
+    ThreadRegularBackup = Thread(target=RegularBackup)
+    ThreadRegularBackup.start()
     executor.start_polling(dp, skip_updates=IsUpdate())

@@ -3,6 +3,8 @@ import sys
 import os
 from typing import Set
 import json
+import zipfile
+import datetime
 
 from NewPrint import Print
 
@@ -10,8 +12,48 @@ listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "Sett
 listOfServiceTables = ["AdminsList", "BlackList", "Reports"]
 listOfStatsTables = ["ChatsTimeStats", "ChatsUsage", "ProcessedCurrencies"]
 
+def CreateFileBackup(filePath: str):
+    if os.path.exists("Backups"):
+        pass
+    else:
+        Print("Folder 'Backups' not found", "E")
+        os.mkdir("Backups")
+        Print("Folder 'Backups' is created", "S")
+    today = datetime.datetime.today()
+    dt = today.strftime("%Y-%m-%d-%H.%M.%S")
+    nameOfDB = filePath.find("/")
+    nameOfDB = filePath[filePath + 1:-7]
+    nameOfArch = 'Backups/' + nameOfDB + '-' + dt + '.zip'
+    zipArch = zipfile.ZipFile(nameOfArch, 'w')
+    try:
+        zipArch.write(filePath)
+        zipArch.close()
+        Print(filePath + " added to " + nameOfArch, "S")
+    except:
+        Print("Cannot add " + filePath + " to archive.", "E")
 
-def DbIntegrityCheck():
+def CreateAllBackups() -> str:
+    if os.path.exists("Backups"):
+        pass
+    else:
+        Print("Folder 'Backups' not found", "E")
+        os.mkdir("Backups")
+        Print("Folder 'Backups' is created", "S")
+    today = datetime.datetime.today()
+    dt = today.strftime("%Y-%m-%d-%H.%M.%S")
+    nameOfArch = 'Backups/backup-' + dt + '.zip'
+    zipArch = zipfile.ZipFile(nameOfArch, 'w')
+    try:
+        zipArch.write("DataBases/DataForBot.sqlite")
+        zipArch.write("DataBases/ServiceData.sqlite")
+        zipArch.write("DataBases/StatsData.sqlite")
+        zipArch.close()
+        Print("Backup " + nameOfArch + " created.", "S")
+    except:
+        Print("Cannot create archive.", "E")
+    return nameOfArch
+
+def DBIntegrityCheck():
     if os.path.exists("DataBases/DataForBot.sqlite"):
         # Connect to DB
         con = sql.connect('DataBases/DataForBot.sqlite')
@@ -26,8 +68,10 @@ def DbIntegrityCheck():
 
         for i in listOfTables:
             if not i in listNames:
+                CreateFileBackup("DataBases/DataForBot.sqlite")
                 os.remove('DataBases/DataForBot.sqlite')
-                Print("Error. Main database is corrupted. 'DataForBot.sqlite' was deleted. New database will be create automatically.", "E")
+                Print("Error. Main database is corrupted. 'DataForBot.sqlite' was backuped and deleted. New database will be create automatically.", "E")
+
                 CreateDataBaseTemplate()
                 break
         Print("Main DB is OK.", "S")
@@ -49,8 +93,10 @@ def DbIntegrityCheck():
 
         for i in listOfServiceTables:
             if not i in listNames:
+                CreateFileBackup("DataBases/ServiceData.sqlite")
                 os.remove('DataBases/ServiceData.sqlite')
-                Print("Error. Service database is corrupted. 'ServiceData.sqlite' was deleted. New database will be create automatically.", "E")
+                Print("Error. Service database is corrupted. 'ServiceData.sqlite' was backuped and deleted. New database will be create automatically.", "E")
+
                 CreateServiceDataBase()
                 break
         Print("Service DB is OK.", "S")
@@ -68,8 +114,9 @@ def DbIntegrityCheck():
 
         for i in listOfStatsTables:
             if not i in listNames:
+                CreateFileBackup("DataBases/StatsData.sqlite")
                 os.remove("DataBases/StatsData.sqlite")
-                Print("Error. Stats database is corrupted. 'StatsData.sqlite' was deleted. New database will be create automatically.", "E")
+                Print("Error. Stats database is corrupted. 'StatsData.sqlite' was backuped and deleted. New database will be create automatically.", "E")
                 CreateStatsDataBase()
                 break
         Print("Stats DB is OK.", "S")
@@ -882,6 +929,19 @@ def GetChatsAmount() -> dict:
     res['groups'] = cursor.fetchone()[0]
     return res
 
+def GetGroupChatIDs() -> list:
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT * from SettingsGroups")
+    res = cursor.fetchall()
+    return [k[0] for k in res]
+
+def GetPrivateChatIDs() -> list:
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT * from SettingsPrivateChats")
+    res = cursor.fetchall()
+    return [k[0] for k in res]
 
 def GetTimeStats() -> dict:
     con = sql.connect('DataBases/StatsData.sqlite')
