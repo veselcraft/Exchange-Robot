@@ -6,8 +6,7 @@ import json
 
 from NewPrint import Print
 
-listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates",
-                "SettingsExchangeRates", "CryptoRates", "SettingsCryptoRates"]
+listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "SettingsExchangeRates", "CryptoRates", "SettingsCryptoRates"]
 listOfServiceTables = ["AdminsList", "BlackList", "Reports"]
 listOfStatsTables = ["ChatsTimeStats", "ChatsUsage", "ProcessedCurrencies"]
 
@@ -75,7 +74,7 @@ def DbIntegrityCheck():
                 break
         Print("Stats DB is OK.", "S")
     else:
-        print("Connected to stats DB unsuccessfully.", "E")
+        Print("Connected to stats DB unsuccessfully.", "E")
         CreateStatsDataBase()
 
 

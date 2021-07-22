@@ -56,7 +56,17 @@ async def DonateMes(message: types.Message):
 
 @dp.message_handler(commands=['wrong'])
 async def WrongMes(message: types.Message):
-    pass
+    if IsUserInBlackList(message.from_user.id):
+        return
+    IsChatExist(message.chat.id, message.chat.type)
+    Print(message, "L")
+    MessageText = message.reply_to_message.text
+    if message.photo or message.video is not None or message.document is not None:
+        MessageText = message.reply_to_message.caption
+    replyMessage = message.reply_to_message
+    Print(replyMessage, "L")
+    DBH.AddReport(message.chat.id, message.from_user.id, MessageText)
+
 
 # Admin`s commands
 @dp.message_handler(commands=['echo'])
