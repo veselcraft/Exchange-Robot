@@ -1,1 +1,14 @@
-Тут будет текст на английском для комманды /help.
+This bot recognizes numbers and currencies in text and automaticaly replies with converted ones.
+
+Exchange rates are updated once in a couple of hours: API: http://data.fixer.io/api/ (Currencies)
+Exchange rates of crypto are updated once in a couple of seconds:  API: https://api.binance.com/api/v3/ (Crypto)
+
+Latest version supports all world's currencies and 14 cryptocurrencies: ADA, BCH, BNB, BTC, DASH, DOGE, ETC, ETH, LTC, RVN, TRX, XLM, XMR, XRP.
+
+Use \about    for more info about authors, version, source code and/or license.
+
+Use \settings to configure privileges or to change output currencies.
+
+Please, if you find a mistake in text recognition, use \wrong to report an issue.
+
+In case of other troubles, consider writting directly to developers.
