@@ -1,7 +1,4 @@
 Token.py
-settings/
-logs/
-__pycaсhe__/
 *.pyc
 *.pyo
 DataBases/*.sqlite

@@ -107,6 +107,8 @@ def DBIntegrityCheck():
     if os.path.exists("DataBases/StatsData.sqlite"):
         con = sql.connect("DataBases/StatsData.sqlite")
         cursor = con.cursor()
+        Print("Connected to stats DB successfully.", "S")
+
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         listNames = cursor.fetchall()
         for i in range(len(listNames)):
@@ -916,7 +918,6 @@ def UpdateChatUsage(chatID: str):
         "UPDATE ChatsUsage SET lastTimeUse = DATETIME() WHERE chatID = "+str(chatID))
     con.commit()
 
-
 def GetChatsAmount() -> dict:
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
@@ -943,7 +944,7 @@ def GetPrivateChatIDs() -> list:
     res = cursor.fetchall()
     return [k[0] for k in res]
 
-def GetTimeStats() -> dict:
+def GetSetTimeStats() -> dict:
     con = sql.connect('DataBases/StatsData.sqlite')
     cursor = con.cursor()
     cursor.execute(
@@ -969,6 +970,29 @@ def GetTimeStats() -> dict:
     con.commit()
     return res
 
+def GetTimeStats() -> dict:
+    con = sql.connect('DataBases/StatsData.sqlite')
+    cursor = con.cursor()
+    cursor.execute(
+        "SELECT COUNT(*) FROM ChatsUsage WHERE chatType = 'private'")
+    res = {}
+    res['private'] = cursor.fetchone()[0]
+    cursor.execute(
+        "SELECT COUNT(*) FROM ChatsUsage WHERE chatType = 'group' OR chatType = 'supergroup'")
+    res['groups'] = cursor.fetchone()[0]
+    cursor.execute(
+        "SELECT COUNT(*) FROM ChatsUsage WHERE chatType = 'private' AND lastTimeUse > datetime('now', '-7 days')")
+    res['activePrivateWeek'] = cursor.fetchone()[0]
+    cursor.execute(
+        "SELECT COUNT(*) FROM ChatsUsage WHERE (chatType = 'group' OR chatType ='supergroup' ) AND lastTimeUse > datetime('now', '-7 days')")
+    res['activeGroupsWeek'] = cursor.fetchone()[0]
+    cursor.execute(
+        "SELECT COUNT(*) FROM ChatsUsage WHERE chatType = 'private' AND lastTimeUse > datetime('now', '-1 month')")
+    res['activePrivateMonth'] = cursor.fetchone()[0]
+    cursor.execute(
+        "SELECT COUNT(*) FROM ChatsUsage WHERE (chatType = 'group' OR chatType ='supergroup' ) AND lastTimeUse > datetime('now', '-1 month')")
+    res['activeGroupsMonth'] = cursor.fetchone()[0]
+    return res
 
 def ProcessedCurrency(chatID: str, userID: str, processedCurrency: str, message: str):
     values_q = [chatID, userID, processedCurrency, message]
