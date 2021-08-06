@@ -27,7 +27,7 @@ def UpdateExchangeRates() -> dict:
     global exchangeRates
     Print("Updating of exchange rates has started.", "S")
     try:
-        url = "http://1data.fixer.io/api/latest?access_key=" + apiKey
+        url = "http://data.fixer.io/api/latest?access_key=" + apiKey
         response = requests.get(url)
         exchangeRates = response.json()['rates']
 
@@ -43,12 +43,12 @@ def UpdateCryptoRates() -> dict:
     global cryptoRates
     Print("Updating of crypto rates has started.", "S")
     try:
-        url = "https://api.binance.com/api/v3/ticker/price1"
+        url = "https://api.binance.com/api/v3/ticker/price"
         response = requests.get(url)
         cryptoRates = {}
         for pair in response.json():
             if pair['symbol'].find("USDT") != -1 and any(pair['symbol'][:-4] == s for s in cryptoList):
-                cryptoRates[pair['symbol']]=pair['price']
+                cryptoRates[pair['symbol']][:-4]=pair['price']
         UpdateCryptoRatesDB(cryptoRates.copy())
         Print("Updating of exchange rates is successfull.", "S")
     except:

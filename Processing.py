@@ -1,12 +1,8 @@
+from TextHelper import GetText
 from NewPrint import Print
 from DBH import GetAllCrypto, GetAllCurrencies, GetExchangeRates, GetListOfCrypto, GetListOfCurrencies, GetDictOfFlags, GetSetting
 import GetExchangeRates
-
-ListOfCur = []
-ListOfCrypto = []
-
-DictOfFlags = {}
-EmptyDictOfFlags = {}
+import ListsCache
 
 ListEntry = []
 ListEqual = []
@@ -65,19 +61,18 @@ def SpecialSplit(MesTxt: str) -> list:
     return b
 
 def LoadCurrencies():
-    global ListOfCur
-    ListOfCur = GetListOfCurrencies()
+    ListsCache.SetListOfCur(GetListOfCurrencies())
 
 def LoadCrypto():
-    global ListOfCrypto
-    ListOfCrypto = GetListOfCrypto()
+    ListsCache.SetListOfCrypto(GetListOfCrypto())
 
 def LoadFlags():
-    global DictOfFlags
-    global EmptyDictOfFlags
-    DictOfFlags = GetDictOfFlags()
+    EmptyDictOfFlags = {}
+    ListsCache.SetDictOfFlags(GetDictOfFlags())
+    DictOfFlags = ListsCache.GetDictOfFlags()
     for i in DictOfFlags:
         EmptyDictOfFlags[i] = ""
+    ListsCache.SetEmptyDictOfFlags(EmptyDictOfFlags)
 
 def LoadDictionaries():
     global ListEntry, ListEqual, ListCryptoEntry, ListCryptoEqual
@@ -458,22 +453,27 @@ def TextToDigit(b: list) -> list:
     return b
     
 def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
+    def TwoZeroesToOne(s: str):
+        while s.rfind("00") == len(s) - 2:
+            s = s[:-1]
+        return s
+
     DictOfFlagsForChat = {}
-    global DictOfFlags
-    global EmptyDictOfFlags
-    global ListOfCur
-    global ListOfCrypto
 
     if GetSetting(chatID, "flags", chatType):
-        DictOfFlagsForChat = DictOfFlags
+        DictOfFlagsForChat = ListsCache.GetDictOfFlags()
     else:
-        DictOfFlagsForChat = EmptyDictOfFlags
+        DictOfFlagsForChat = ListsCache.GetEmptyDictOfFlags()
+
+    isCryptoLink = False
 
     answer = ''
     for i in range(len(Arr[1])): #Проходимся по всем распознаным классическим валютам
+        
+        
         answer += "\n" + "======" + "\n"
         CurVault = float(Arr[0][i])
-        CurCurrency = ListOfCur[Arr[1][i]]
+        CurCurrency = ListsCache.GetListOfCur()[Arr[1][i]]
         PartOfAnswer = DictOfFlagsForChat[CurCurrency] + str(f'{CurVault:,.2f}'.replace(","," ")) + " " + CurCurrency + "\n"
 
         ListOfChatCurrencies = GetAllCurrencies(chatID)
@@ -498,21 +498,23 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
             PartOfAnswer += "\n"
         
         for j in ListOfChatCrypto: #Проходимся по всем криптовалютам
+            isCryptoLink = True
             if CurCurrency == 'EUR':
                 Vault = round(CurVault / GetExchangeRates.exchangeRates[CurCurrency] / GetExchangeRates.cryptoRates[j], 9)
                 Vault = f'{Vault:,.9f}'.replace(","," ")
-                PartOfAnswer += "\n" + str(Vault) + " " + j
+                PartOfAnswer += "\n" + TwoZeroesToOne(str(Vault)) + " " + j
             elif CurCurrency != 'EUR':
                 Vault = round(CurVault * (GetExchangeRates.exchangeRates['USD'] / GetExchangeRates.exchangeRates[CurCurrency] / GetExchangeRates.cryptoRates[j]), 9)
                 Vault = f'{Vault:,.9f}'.replace(","," ")
-                PartOfAnswer += "\n" + str(Vault) + " " + j
+                PartOfAnswer += "\n" + TwoZeroesToOne(str(Vault)) + " " + j
         answer += PartOfAnswer + "\n"
 
     for i in range(len(Arr[3])): #Проходимся по всем распознаным криптовалютам
+        isCryptoLink = True
         answer += "\n" + "======" + "\n"
         CurVault = float(Arr[2][i])
-        CurCurrency = ListOfCrypto[Arr[3][i]]
-        PartOfAnswer = str(f'{CurVault:,.9f}'.replace(","," ")) + " " + CurCurrency + "\n"
+        CurCurrency = ListsCache.GetListOfCrypto()[Arr[3][i]]
+        PartOfAnswer = TwoZeroesToOne(str(f'{CurVault:,.9f}'.replace(","," "))) + " " + CurCurrency + "\n"
 
         ListOfChatCurrencies = GetAllCurrencies(chatID)
         ListOfChatCrypto = GetAllCrypto(chatID)
@@ -535,8 +537,11 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
             else:
                 Vault = round(CurVault * GetExchangeRates.cryptoRates[CurCurrency] / GetExchangeRates.cryptoRates[j], 9)
                 Vault = f'{Vault:,.9f}'.replace(","," ")
-                PartOfAnswer += "\n" + str(Vault) + " " + j
+                PartOfAnswer += "\n" + TwoZeroesToOne(str(Vault)) + " " + j
         answer += PartOfAnswer + "\n"
+
+    if isCryptoLink:
+        answer += "\n" + GetText(chatID, 'Crypto', chatType) + '<a href="https://accounts.binance.com/en/register?ref=GGMQ44GG">Binance</a>.'
 
     return answer
 

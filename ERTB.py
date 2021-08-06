@@ -21,6 +21,7 @@ import Processing
 from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit
 import TextHelper as CustomMarkup
 from TextHelper import LoadTexts, GetText
+import ListsCache
 
 # Main variables
 bot = Bot(token=botToken)
@@ -248,7 +249,7 @@ async def MainVoid(message: types.Message):
         if message.forward_from.username == botUsername:
             return
     except:
-        Print("Its not forward message.", "W")
+        pass
 
     # Checking if a user is on the blacklist
     if IsUserInBlackList(message.from_user.id):
@@ -295,12 +296,12 @@ async def MainVoid(message: types.Message):
         return
 
     result = AnswerText(NumArray, message.chat.id, message.chat.type)
-    await message.reply(result, reply_markup = CustomMarkup.DeleteMarkup(message.chat.id, message.chat.type))
+    await message.reply(result, parse_mode = "HTML", reply_markup = CustomMarkup.DeleteMarkup(message.chat.id, message.chat.type))
     DBH.UpdateChatUsage(message.chat.id)
     for i in NumArray[1]:
-        DBH.ProcessedCurrency(message.chat.id, message.from_user.id, Processing.ListOfCur[i], OriginalMessageText)
+        DBH.ProcessedCurrency(message.chat.id, message.from_user.id, ListsCache.GetListOfCur()[i], OriginalMessageText)
     for i in NumArray[3]:
-        DBH.ProcessedCurrency(message.chat.id, message.from_user.id, Processing.ListOfCrypto[i], OriginalMessageText)
+        DBH.ProcessedCurrency(message.chat.id, message.from_user.id, ListsCache.GetListOfCrypto()[i], OriginalMessageText)
 
 @dp.callback_query_handler(lambda call: True)
 async def CallbackAnswer(call: types.CallbackQuery):
@@ -343,8 +344,8 @@ async def CallbackAnswer(call: types.CallbackQuery):
         if Value == "menu":
             pass
         elif Value == "button":
-            IsButton = DBH.GetSetting(call.message.chat.id, 'deleteButton', call.message.chat.type)
-            DBH.SetSetting(call.message.chat.id, 'deleteButton', int(not IsButton), call.message.chat.type)
+            IsFlag = DBH.GetSetting(call.message.chat.id, 'deleteButton', call.message.chat.type)
+            DBH.SetSetting(call.message.chat.id, 'deleteButton', int(not IsFlag), call.message.chat.type)
         else:
             DBH.SetSetting(call.message.chat.id, 'deleteRules', Value, call.message.chat.type)
         await bot.edit_message_text(GetText(call.message.chat.id, 'delete_button_menu', call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.DeleteButtonMenuMarkup(call.message.chat.id, call.message.chat.type))
@@ -360,6 +361,62 @@ async def CallbackAnswer(call: types.CallbackQuery):
         else:
             DBH.SetSetting(call.message.chat.id, 'lang', Value, call.message.chat.type)
         await bot.edit_message_text(GetText(call.message.chat.id, 'lang_menu', call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.LanguageMenuMarkup(call.message.chat.id, call.message.chat.type))
+    
+    elif str(call.data).find("flags_") == 0:
+        member = await call.message.chat.get_member(call.from_user.id)
+        if not CanUserEditSettings(call.message.chat.id, call.message.chat.type, member.status, call.message.chat.all_members_are_administrators):
+            return
+        Index = str(call.data).find("_") + 1
+        Value = str(call.data)[Index:len(str(call.data))]
+        if Value == "menu":
+            pass
+        elif Value == "button":
+            IsFlag = DBH.GetSetting(call.message.chat.id, 'flags', call.message.chat.type)
+            DBH.SetSetting(call.message.chat.id, 'flags', int(not IsFlag), call.message.chat.type)
+        await bot.edit_message_text(GetText(call.message.chat.id, 'flags_menu', call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.FlagsMarkup(call.message.chat.id, call.message.chat.type))
+
+    elif str(call.data).find("edit_") == 0:
+        member = await call.message.chat.get_member(call.from_user.id)
+        memberStatus = member.status
+        if not CanUserEditSettings(call.message.chat.id, call.message.chat.type, memberStatus, call.message.chat.all_members_are_administrators):
+            return
+        Index = str(call.data).find("_") + 1
+        Value = str(call.data)[Index:len(str(call.data))]
+        if Value == "menu":
+            pass
+        else:
+            if memberStatus == "member":
+                pass
+            elif memberStatus == "administrator" and (Value == "admins" or Value == "everybody"):
+                DBH.SetSetting(call.message.chat.id, 'editSettings', Value, call.message.chat.type)
+            elif memberStatus == "creator":
+                DBH.SetSetting(call.message.chat.id, 'editSettings', Value, call.message.chat.type)
+        await bot.edit_message_text(GetText(call.message.chat.id, 'edit_menu', call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.EditMenuMarkup(call.message.chat.id, call.message.chat.type))
+    
+    elif str(call.data).find("cur_") == 0:
+        member = await call.message.chat.get_member(call.from_user.id)
+        memberStatus = member.status
+        if not CanUserEditSettings(call.message.chat.id, call.message.chat.type, memberStatus, call.message.chat.all_members_are_administrators):
+            return
+        Index = str(call.data).find("_") + 1
+        Value = str(call.data)[Index:len(str(call.data))]
+
+        if Value == "menu":
+            await bot.edit_message_text(GetText(call.message.chat.id, "currencies_mainmenu", call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.CurrenciesMainMenuMarkup(call.message.chat.id, call.message.chat.type))
+        elif Value == "cryptomenu":
+            await bot.edit_message_text(GetText(call.message.chat.id, "crypto_mainmenu", call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.CryptoMenuMarkup(call.message.chat.id, call.message.chat.type))
+        elif Value == "curmenu":
+            await bot.edit_message_text(GetText(call.message.chat.id, "currencies_menu", call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.CurrenciesMenuMarkup(call.message.chat.id, call.message.chat.type))
+        elif len(Value) == 1 or len(Value) == 2:
+            await bot.edit_message_text(GetText(call.message.chat.id, "letter_menu", call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.CurrenciesSetupMarkup(call.message.chat.id, call.message.chat.type, Value))
+        elif len(Value) == 3 or len(Value) == 4:
+            DBH.ReverseCurrencySetting(call.message.chat.id, Value)
+            if Value in ListsCache.GetListOfCrypto():
+                await bot.edit_message_text(GetText(call.message.chat.id, "crypto_mainmenu", call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.CryptoMenuMarkup(call.message.chat.id, call.message.chat.type))
+            else:
+                dictForMU = {'A': 'a', 'B': 'b', 'C': 'c', 'D': 'df', 'E': 'df', 'F': 'df', 'G': 'gh', 'H': 'gh', 'I': 'ij', 'J': 'ij', 'K': 'kl', 'L': 'kl', 'M': 'm', 'N': 'nq', 'O': 'nq', 'P': 'nq', 'Q': 'nq', 'R': 'rs', 'S': 'rs', 'T': 'tu', 'U': 'tu', 'V': 'vy', 'W': 'vy', 'X': 'vy', 'Y': 'vy'}
+                await bot.edit_message_text(GetText(call.message.chat.id, "letter_menu", call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.CurrenciesSetupMarkup(call.message.chat.id, call.message.chat.type, dictForMU[Value[0]]))
+
     elif call.data == "settings":
         await bot.edit_message_text(GetText(call.message.chat.id, "main_settings_menu", call.message.chat.type), call.message.chat.id, call.message.message_id, reply_markup = CustomMarkup.SettingsMarkup(call.message.chat.id, call.message.chat.type))
 
@@ -444,6 +501,6 @@ if __name__ == '__main__':
     ThreadUpdateCryptoRates.start()
     ThreadRegularBackup = Thread(target = RegularBackup)
     ThreadRegularBackup.start()
-    """ ThreadRegularStats = Thread(target = RegularStats)
-    ThreadRegularStats.start() """
+    ThreadRegularStats = Thread(target = RegularStats)
+    ThreadRegularStats.start()
     executor.start_polling(dp, skip_updates = IsUpdate())

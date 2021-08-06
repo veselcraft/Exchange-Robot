@@ -676,6 +676,23 @@ def SetCurrencySetting(chatID: str, currency: str, val: str):
     except:
         Print("No such column.", "E")
 
+def ReverseCurrencySetting(chatID: str, currency: str):
+    chatID = int(chatID)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    try:
+        cursor.execute("SELECT "+ "_"+str(currency) + " from SettingsExchangeRates WHERE chatID = "+str(chatID))
+        res = cursor.fetchone()
+        cursor.execute("UPDATE OR ABORT SettingsExchangeRates SET " + "_"+str(currency)+"= "+str(int(not res[0]))+" WHERE chatID = "+str(chatID))
+        con.commit()
+    except:
+        try:
+            cursor.execute("SELECT "+str(currency) + " from SettingsCryptoRates WHERE chatID = "+str(chatID))
+            res = cursor.fetchone()
+            cursor.execute("UPDATE OR ABORT SettingsCryptoRates SET " + str(currency)+"= "+str(int(not res[0]))+" WHERE chatID = "+str(chatID))
+            con.commit()
+        except:
+            Print("No such column.", "E")
 
 def SetCryptoSetting(chatID: str, crypto: str, val: str):
     chatID = int(chatID)

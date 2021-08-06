@@ -10,7 +10,10 @@ ButtonTexts = {'en':
                     'admins': 'Administrators',
                     'everybody': 'All members',
                     'delbutton': 'Delete-Button',
-                    'back': 'Back'},
+                    'back': 'Back',
+                    'flags_button': 'Flags',
+                    'cur_menu': 'Classic currency settings',
+                    'crypto_menu': 'Cryptocurrency settings'},
                 'ru':
                     {'donate': 'Поддержать',
                     'delete': 'Удалить',
@@ -23,7 +26,10 @@ ButtonTexts = {'en':
                     'admins': 'Администраторы',
                     'everybody': 'Все участники',
                     'delbutton': 'Кнопка \'Удалить\'',
-                    'back': 'Назад'},
+                    'back': 'Назад',
+                    'flags_button': 'Флаги',
+                    'cur_menu': 'Настройки классических валют',
+                    'crypto_menu': 'Настройки криптовалют'},
                 'ua':
                     {'donate': 'Підтримати',
                     'delete': 'Видалити',
@@ -36,5 +42,8 @@ ButtonTexts = {'en':
                     'admins': 'Адміністратори',
                     'everybody': 'Усі учасники',
                     'delbutton': 'Кнопка \'Видалити\'',
-                    'back': 'Назад'}
+                    'back': 'Назад',
+                    'flags_button': 'Прапори',
+                    'cur_menu': 'Налаштування класичних валют',
+                    'crypto_menu': 'Налаштування криптовалют'}
                 }
