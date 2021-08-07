@@ -327,6 +327,7 @@ async def MainVoid(message: types.Message):
     MessageText = MessageText.lower()
     MessageText = w2n(MessageText, 'uk')
     MessageText = w2n(MessageText, 'ru')
+    MessageText = w2n(MessageText, 'en')
     Print(MessageText, "L")
 
     # Check digit
