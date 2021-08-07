@@ -1,3 +1,5 @@
+Token.py
 *.pyc
 *.pyo
-Token.py
+DataBases/*.sqlite
+Backups/*.zip
