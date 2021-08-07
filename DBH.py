@@ -16,7 +16,7 @@ def CreateFileBackup(filePath: str):
     if os.path.exists("Backups"):
         pass
     else:
-        Print("Folder 'Backups' not found", "E")
+        Print("Folder 'Backups' not found.", "E")
         os.mkdir("Backups")
         Print("Folder 'Backups' is created", "S")
     today = datetime.datetime.today()
@@ -36,7 +36,7 @@ def CreateAllBackups() -> str:
     if os.path.exists("Backups"):
         pass
     else:
-        Print("Folder 'Backups' not found", "E")
+        Print("Folder 'Backups' not found.", "E")
         os.mkdir("Backups")
         Print("Folder 'Backups' is created", "S")
     today = datetime.datetime.today()
@@ -663,7 +663,7 @@ def SetSetting(chatID: str, key: str, val: str, chatType: str):
             cursor.execute("UPDATE OR ABORT SettingsPrivateChats SET "+str(key)+" = ? WHERE chatID = ?", (val, chatID))
         con.commit()
     except:
-        Print("No such column.", "E")
+        Print("No such column. Cannot find '" + str(key) + "'. Error in 'SetSetting'.", "E")
 
 
 def SetCurrencySetting(chatID: str, currency: str, val: str):
@@ -674,7 +674,7 @@ def SetCurrencySetting(chatID: str, currency: str, val: str):
         cursor.execute("UPDATE OR ABORT SettingsExchangeRates SET " + "_"+str(currency)+"= "+str(val)+" WHERE chatID = "+str(chatID))
         con.commit()
     except:
-        Print("No such column.", "E")
+        Print("No such column. Cannot find '" + str(currency) + "'. Error in 'SetCurrencySetting'.", "E")
 
 def ReverseCurrencySetting(chatID: str, currency: str):
     chatID = int(chatID)
@@ -692,7 +692,7 @@ def ReverseCurrencySetting(chatID: str, currency: str):
             cursor.execute("UPDATE OR ABORT SettingsCryptoRates SET " + str(currency)+"= "+str(int(not res[0]))+" WHERE chatID = "+str(chatID))
             con.commit()
         except:
-            Print("No such column.", "E")
+            Print("No such column. Cannot find '" + str(currency) + "'. Error in 'ReverseCurrencySetting'.", "E")
 
 def SetCryptoSetting(chatID: str, crypto: str, val: str):
     chatID = int(chatID)
@@ -702,7 +702,7 @@ def SetCryptoSetting(chatID: str, crypto: str, val: str):
         cursor.execute("UPDATE OR ABORT SettingsCryptoRates SET " +str(crypto)+"= "+str(val)+" WHERE chatID = "+str(chatID))
         con.commit()
     except:
-        Print("No such column.", "E")
+        Print("No such column. Cannot find '" + str(crypto) + "'. Error in 'SetCryptoSetting'.", "E")
 
 
 def GetAllSettings(chatID: str, chatType: str) -> dict:
@@ -721,7 +721,7 @@ def GetAllSettings(chatID: str, chatType: str) -> dict:
             res = cursor.fetchone()
         return dict(res)
     except:
-        Print("No such chatID.", "E")
+        Print("No such column. Cannot find '" + str(chatID) + "'. Error in 'GetAllSettings'.", "E")
         return None
 
 
@@ -732,7 +732,7 @@ def GetSetting(chatID: str, key: str, chatType: str) -> str:
     try:
         if chatType == "group" or chatType == "supergroup":
             cursor.execute("SELECT "+str(key) +
-                           " from SettingsGroups WHERE chatID = "+str(chatID))
+                            " from SettingsGroups WHERE chatID = "+str(chatID))
             res = cursor.fetchone()
         else:
             cursor.execute(
@@ -740,7 +740,7 @@ def GetSetting(chatID: str, key: str, chatType: str) -> str:
             res = cursor.fetchone()
         return res[0]
     except:
-        Print("No such column.", "E")
+        Print("No such column. Cannot find '" + str(key) + "'. Error in 'GetSetting'.", "E")
         return None
 
 
@@ -755,7 +755,7 @@ def GetAllCurrencies(chatID: str) -> list:
         res = dict(cursor.fetchone())
         return [k[1:] for k, v in res.items() if v == 1]
     except:
-        Print("No such chatID.", "E")
+        Print("No such column. Cannot find '" + str(chatID) + "'. Error in 'GetAllCurrencies'.", "E")
         return None
 
 
@@ -770,7 +770,7 @@ def GetAllCrypto(chatID: str) -> list:
         res = dict(cursor.fetchone())
         return [k for k, v in res.items() if v == 1]
     except:
-        Print("No such chatID.", "E")
+        Print("No such column. Cannot find '" + str(chatID) + "'. Error in 'GetAllCrypto'.", "E")
         return None
 
 
@@ -810,7 +810,7 @@ def ClearBlacklist(userID: str):
             con.commit()
             return 1
         except:
-            Print("No such userID.", "E")
+            Print("No such column. Cannot find '" + str(userID) + "'. Error in 'ClearBlacklist'.", "E")
             return None
 
 
@@ -873,7 +873,7 @@ def ClearAdmins(adminID: str):
             con.commit()
             return 1
         except:
-            Print("No such adminID.", "E")
+            Print("No such adminID. Cannot find '" + str(adminID) + "'. Error in 'ClearAdmins'.", "E")
             return None
 
 

@@ -9,7 +9,8 @@ MessageTexts = {'en':
                     'currencies_mainmenu': 'Please, choose necessary option:',
                     'crypto_mainmenu': 'Set up the cryptocurrencies to be converted:',
                     'currencies_menu': 'Select the letter with which the code of the currency you need begins:',
-                    'letter_menu': 'Set up the currencies to be converted:'},
+                    'letter_menu': 'Set up the currencies to be converted:',
+                    'added_to_bl': 'Hello, you have been blocked to avoid a heavy load on the server. If this happened by accident, please write my creators: @volkovskey, @vladikko'},
                 'ru':
                     {'main_settings_menu': 'Пожалуйста, выберите необходимый пункт:',
                     'error_main_settings_menu': 'У вас нет прав для доступа к этому меню.',
@@ -21,7 +22,8 @@ MessageTexts = {'en':
                     'currencies_mainmenu': 'Пожалуйста, выберите необходимый пункт:',
                     'crypto_mainmenu': 'Настройте криптовалюты для конвертации:',
                     'currencies_menu': 'Выберите букву, с которой начинается код нужной вам валюты:',
-                    'letter_menu': 'Настройте криптовалюты для конвертации:'},
+                    'letter_menu': 'Настройте криптовалюты для конвертации:',
+                    'added_to_bl': 'Здравствуйте, вы были заблокированы во избежания большой нагрузки на сервер. Если это произошло случайно, пожалуйста, напишите моим создателям: @volkovskey, @vladikko'},
                 'ua':
                     {'main_settings_menu': 'Будь ласка, оберіть необхідний пункт:',
                     'error_main_settings_menu': 'У вас немає прав для доступу до цього меню.',
@@ -33,4 +35,5 @@ MessageTexts = {'en':
                     'currencies_mainmenu': 'Будь ласка, оберіть необхідний пункт:',
                     'crypto_mainmenu': 'Налаштуйте криптовалюти для конвертації:',
                     'currencies_menu': 'Оберіть літеру, з якої починається код потрібної вам валюти:',
-                    'letter_menu': 'Налаштуйте криптовалюти для конвертації:'}}
+                    'letter_menu': 'Налаштуйте криптовалюти для конвертації:',
+                    'added_to_bl': 'Привіт, ві були заблоковані, щоб попередити велике навантаження на сервер. Якщо це сталося помилково, будьте ласкаві, напишіть моїм творцям: @volkovskey, @vladikko'}}
