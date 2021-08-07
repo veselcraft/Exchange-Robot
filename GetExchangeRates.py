@@ -21,7 +21,7 @@ def SheduleCryptoUpdate():
     global cryptoRates
     while True:
         cryptoRates = UpdateCryptoRates()
-        time.sleep(14400)
+        time.sleep(10)
 
 def UpdateExchangeRates() -> dict:
     global exchangeRates
