@@ -915,8 +915,7 @@ def UpdateCryptoRatesDB(cryptoRates: dict):
     f = open("Dictionaries/currencies.json", encoding="utf-8")
     data = json.load(f)
     for cur, rate in cryptoRates.items():
-        cursor.execute("INSERT OR REPLACE INTO CryptoRates (currency,flag,exchangeRates) values ('" +
-                       cur[:-4]+"','"+""+"',?)", tuple([rate]))
+        cursor.execute("INSERT OR REPLACE INTO CryptoRates (currency,flag,exchangeRates) values ('" +cur+"','"+""+"',?)", tuple([rate]))
     con.commit()
 
 

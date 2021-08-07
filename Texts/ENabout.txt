@@ -4,7 +4,7 @@ Bot recognizes number-currency pairs in messages and automatically converts them
 
 It's an open source project distributed under MIT license. License: https://github.com/volkovskey/exchange-rates-tg-bot/blob/master/LICENSE.
 
-Version: 2.0 Alfa
+Version: 2.0 Beta
 
 Authors: @volkovskey & @vladikko
 
