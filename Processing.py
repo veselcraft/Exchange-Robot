@@ -13,6 +13,15 @@ _eng_chars = u"`qwertyuiop[]asdfghjkl;'zxcvbnm,.QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM,
 _rus_chars = u"ёйцукенгшщзхъфывапролджэячсмитьбюЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ"
 _ukr_chars = u"'йцукенгшщзхїфівапролджєячсмитьбюЙЦУКЕНГШЩЗХЇФІВАПРОЛДЖЄЯЧСМИТЬБЮ"
 
+def RemoveUsernames(MesTxt: str) -> str:
+    indexOfAtSign = -1
+    indexOfSpace = -1
+    while MesTxt.find("@") != -1:
+        indexOfAtSign = MesTxt.find("@")
+        indexOfSpace = MesTxt.find(" ", indexOfAtSign)
+        MesTxt = MesTxt[0:indexOfAtSign] + MesTxt[indexOfSpace:]
+    return MesTxt
+
 def SpecialSplit(MesTxt: str) -> list:
     MesTxt = MesTxt.replace("\n", " , ") # Replace hyphenation with dot
 

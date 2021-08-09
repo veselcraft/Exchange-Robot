@@ -2,7 +2,7 @@ ada
 bch
 bnb
 btc,бтк
-dash
+dash,деш,дэш,деша,дэша
 doge
 etc
 eth

@@ -10,7 +10,7 @@ counterE = 0
 def Print(printingText: str, status: str = ""):
     printingText = str(printingText)
     global counterS, counterL, counterE
-    if consoleLog:
+    if consoleLog or status == "E" or status == "e":
         status = status.lower()
         if status == 's':
             print("\033[36m{} ".format("Service") + "\033[37m{}".format(str(counterS)) + ": "+ printingText)

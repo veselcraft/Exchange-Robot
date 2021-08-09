@@ -85,7 +85,7 @@ lkr
 lrd
 lsl
 ltl
-lvl
+lvl$
 lyd
 mad
 mdl
@@ -137,7 +137,7 @@ thb
 tjs
 tmt
 tnd
-top
+top$
 try,₤
 ttd
 twd

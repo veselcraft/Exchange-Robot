@@ -50,7 +50,7 @@ def UpdateCryptoRates() -> dict:
             if pair['symbol'].find("USDT") != -1 and any(pair['symbol'][:-4] == s for s in cryptoList):
                 cryptoRates[pair['symbol'][:-4]]=float(pair['price'])
         UpdateCryptoRatesDB(cryptoRates.copy())
-        Print("Updating of exchange rates is successfull.", "S")
+        Print("Updating of crypto rates is successfull.", "S")
     except:
         Print("Updating CR failed.", "E")
         Print("Using crypto rates from DB.", "S")

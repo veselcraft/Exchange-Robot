@@ -1,10 +1,10 @@
 import sqlite3 as sql
 import os
 import ast
-from DBH import DbIntegrityCheck, AddIDStats
+from DBH import DBIntegrityCheck, AddIDStats
 
 
-DbIntegrityCheck()
+DBIntegrityCheck()
 if os.path.exists("DataBases/DataForBot.sqlite") and os.path.exists("settings"):
     #Connect to DB
     con = sql.connect('DataBases/DataForBot.sqlite')
@@ -30,6 +30,7 @@ if os.path.exists("DataBases/DataForBot.sqlite") and os.path.exists("settings"):
             row = (filename[:-5],d.get("delete_button"))
             cursor.execute(query_private,row)
             AddIDStats(filename[:-5],"private")
+        cursor.execute("INSERT OR IGNORE INTO SettingsCryptoRates (chatID) values (?)", tuple([filename[:-5]]))
     con.commit()
     print("Main DB has been transfered succesfuly")
     if os.path.exists("logs"):
