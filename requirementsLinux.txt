@@ -5,3 +5,4 @@ cchardet==2.1.7
 aiodns==3.0.0
 aiohttp[speedups]==3.7.4.post0
 Numberize==0.1.7
+requests==2.26.0

@@ -94,7 +94,7 @@ Below are all the arguments to run:
   </tr>
   <tr>
     <td><code>/count</code></td>
-    <td>ПGetting information about the number of bot users. You can use <code>/count short</code> for counting only in group chats </td>
+    <td>Getting information about the number of bot users. You can use <code>/count short</code> for counting only in group chats </td>
   </tr>
   <tr>
     <td><code>/newadmin</code></td>
