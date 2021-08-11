@@ -29,6 +29,10 @@ bot = Bot(token=botToken)
 dp = Dispatcher(bot)
 IsStartedCount = False
 
+numberizerUA = numberize.Numberizer(lang='uk')
+numberizerRU = numberize.Numberizer(lang='ru')
+numberizerEN = numberize.Numberizer(lang='en')
+
 # Public commands
 @dp.message_handler(commands=['about'])  # analog about and source
 async def AboutMes(message: types.Message):
@@ -296,8 +300,12 @@ async def MainVoid(message: types.Message):
     chatType = message.chat.type
 
     def w2n(MesString: str, lang: str):
-        numberizer = numberize.Numberizer(lang=lang)
-        return numberizer.replace_numerals(MesString)
+        if lang == "ua":
+            return numberizerUA.replace_numerals(MesString)
+        elif lang == "ru":
+            return numberizerRU.replace_numerals(MesString)
+        else:
+            return numberizerEN .replace_numerals(MesString)
 
     try:
         if message.forward_from.username == botUsername:
@@ -547,18 +555,24 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 3:
         if not CheckArgument(sys.argv[1], sys.argv[2]):
+            Print("Error arg.", "E")
             sys.exit()
     elif len(sys.argv) == 5 and sys.argv[1] != sys.argv[3]:
         if not CheckArgument(sys.argv[1], sys.argv[2]):
+            Print("Error arg.", "E")
             sys.exit()
         elif not CheckArgument(sys.argv[3], sys.argv[4]):
+            Print("Error arg.", "E")
             sys.exit()
     elif len(sys.argv) == 7 and sys.argv[1] != sys.argv[3] and sys.argv[1] != sys.argv[2] and sys.argv[2] != sys.argv[3]:
         if not CheckArgument(sys.argv[1], sys.argv[2]):
+            Print("Error arg.", "E")
             sys.exit()
         elif not CheckArgument(sys.argv[3], sys.argv[4]):
+            Print("Error arg.", "E")
             sys.exit()
         elif not CheckArgument(sys.argv[5], sys.argv[6]):
+            Print("Error arg.", "E")
             sys.exit()
     elif len(sys.argv) == 5 and not sys.argv[1] != sys.argv[3] or len(sys.argv) == 7 and not (sys.argv[1] != sys.argv[3] and sys.argv[1] != sys.argv[2] and sys.argv[2] != sys.argv[3]):
         Print("Error. Duplicate argument.", "E")
