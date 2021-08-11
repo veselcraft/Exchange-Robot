@@ -326,9 +326,9 @@ async def MainVoid(message: types.Message):
     OriginalMessageText = MessageText
     MessageText = MessageText.lower()
     MessageText = RemoveUsernames(MessageText)
-    #MessageText = w2n(MessageText, 'ru')
-    #MessageText = w2n(MessageText, 'uk')
-    #MessageText = w2n(MessageText, 'en')
+    MessageText = w2n(MessageText, 'ru')
+    MessageText = w2n(MessageText, 'uk')
+    MessageText = w2n(MessageText, 'en')
     Print(MessageText, "L")
 
     # Check digit

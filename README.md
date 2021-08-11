@@ -8,7 +8,8 @@
   <li>cchardet</li>
   <li>aiodns</li>
   <li>aiohttp[speedups]</li>
-  <li>Numberize 0.1.7</li>
+  <li>Numberize 1.0.0</li>
+  <li>Requests 2.26.0</li>
 </ul>
 <b>ENGLISH VERSION</b><br>
 ERTB – exchange rates telegram bot.<br>
