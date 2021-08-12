@@ -1,3 +1,4 @@
+from NewPrint import Print
 import time
 import BlackList
 

@@ -344,7 +344,11 @@ async def MainVoid(message: types.Message):
         return
 
     # Preparing a message for searching currencies
-    TextArray = SpecialSplit(MessageText)
+    try:
+        TextArray = SpecialSplit(MessageText)
+    except:
+        Print("Error split.", "E")
+        return
     Print(str(TextArray), "L")
 
     # '5kk USD' to '5000000 USD'
@@ -367,7 +371,13 @@ async def MainVoid(message: types.Message):
         return
     
     result = AnswerText(NumArray, chatID, chatType)
-    await message.reply(result, parse_mode = "HTML", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+    try:
+        await message.reply(result, parse_mode = "HTML", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+    except:
+        Print("Cannot send message", "E")
+        Print("Username: " + str(message.from_user.username) + " | User ID: " + str(message.from_user.id) + " | First name: " + str(message.from_user.first_name) + " | Last name: " + str(message.from_user.last_name), "E")
+        Print("Chat ID: " + str(message.chat.id) + " | Chat name: " + str(message.chat.title) + " | Chat username: "+str(message.chat.username) + " | Chat type: "+str(message.chat.type), "E")
+        Print("Message: " + str(OriginalMessageText), "E")
     DBH.UpdateChatUsage(chatID)
     for i in NumArray[1]:
         DBH.ProcessedCurrency(chatID, fromUserId, ListsCache.GetListOfCur()[i], OriginalMessageText)

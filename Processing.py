@@ -17,9 +17,12 @@ def RemoveUsernames(MesTxt: str) -> str:
     indexOfAtSign = -1
     indexOfSpace = -1
     while MesTxt.find("@") != -1:
-        indexOfAtSign = MesTxt.find("@")
-        indexOfSpace = MesTxt.find(" ", indexOfAtSign)
-        MesTxt = MesTxt[0:indexOfAtSign] + MesTxt[indexOfSpace:]
+        if MesTxt.find("@") != len(MesTxt) - 1:
+            indexOfAtSign = MesTxt.find("@")
+            indexOfSpace = MesTxt.find(" ", indexOfAtSign)
+            MesTxt = MesTxt[0:indexOfAtSign] + MesTxt[indexOfSpace:]
+        else:
+            MesTxt = MesTxt[0:-1]
     return MesTxt
 
 def SpecialSplit(MesTxt: str) -> list:
@@ -67,6 +70,12 @@ def SpecialSplit(MesTxt: str) -> list:
     for i in a:
         if i != "":
             b.append(i)
+    
+    for i in range(len(b)):
+        if b[i][0].isdigit() and b[i].count(".") >= 2:
+            while b[i].find(".") != -1:
+                b[i] = b[i].replace(".", "")
+
     return b
 
 def LoadCurrencies():
