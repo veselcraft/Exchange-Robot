@@ -30,7 +30,7 @@ def UpdateExchangeRates() -> dict:
         url = "http://data.fixer.io/api/latest?access_key=" + apiKey
         response = requests.get(url)
         exchangeRates = response.json()['rates']
-
+        exchangeRates['TMT'] = exchangeRates['RUB']/2
         UpdateExchangeRatesDB(exchangeRates.copy())
         Print("Updating of exchange rates is successfull.", "S")
     except:
