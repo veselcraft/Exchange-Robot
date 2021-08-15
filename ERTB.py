@@ -244,7 +244,8 @@ async def FullStatsVoid(message: types.Message):
         return
     if DBH.IsAdmin(fromUserId):
         chatStats = DBH.GetTimeStats()
-        answerMes = "За всё время:\nЛС: " + str(chatStats['private']) + "\nГруппы: " + str(chatStats['groups']) + "\n\nЗа неделю:\nЛС: " + str(chatStats['activePrivateWeek']) + "\nГруппы: " + str(chatStats['activeGroupsWeek']) + "\n\nЗа 30 дней:\nЛС: " + str(chatStats['activePrivateMonth']) + "\nГруппы: " + str(chatStats['activeGroupsMonth'])
+        StatsByOneDay = DBH.GetStatsInPeriod(1)
+        answerMes = "За всё время:\nЛС: " + str(chatStats['private']) + "\nГруппы: " + str(chatStats['groups']) + "\n\nЗа сутки:\nЛС: " + str(StatsByOneDay['activePrivate']) + "\nГруппы: " + str(StatsByOneDay['activeGroups']) + "\n\nЗа неделю:\nЛС: " + str(chatStats['activePrivateWeek']) + "\nГруппы: " + str(chatStats['activeGroupsWeek']) + "\n\nЗа 30 дней:\nЛС: " + str(chatStats['activePrivateMonth']) + "\nГруппы: " + str(chatStats['activeGroupsMonth'])
         await message.reply(answerMes, reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
 
 @dp.message_handler(commands=['backup']) # analog "backup", "logs" and "reports".
@@ -298,7 +299,7 @@ async def MainVoid(message: types.Message):
     fromUserId = message.from_user.id
     chatID = message.chat.id
     chatType = message.chat.type
-
+ 
     def w2n(MesString: str, lang: str):
         if lang == "ua":
             return numberizerUA.replace_numerals(MesString)
