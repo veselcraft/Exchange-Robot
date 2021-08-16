@@ -178,7 +178,7 @@ def CurrenciesMenuMarkup(chatID: str, chatType: str) -> InlineKeyboardMarkup:
     CurrenciesMenuMU.add(InlineKeyboardButton("N-Q", callback_data = "cur_nq"))
     CurrenciesMenuMU.add(InlineKeyboardButton("R-S", callback_data = "cur_rs"))
     CurrenciesMenuMU.add(InlineKeyboardButton("T-U", callback_data = "cur_tu"))
-    CurrenciesMenuMU.add(InlineKeyboardButton("V-Y", callback_data = "cur_vy"))
+    CurrenciesMenuMU.add(InlineKeyboardButton("V-Z", callback_data = "cur_vz"))
     CurrenciesMenuMU.add(InlineKeyboardButton(dictLang['back'], callback_data = "cur_menu"))
     return CurrenciesMenuMU
 

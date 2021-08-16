@@ -502,7 +502,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
             if Value in ListsCache.GetListOfCrypto():
                 await bot.edit_message_text(GetText(chatID, "crypto_mainmenu", chatType), chatID, call.message.message_id, reply_markup = CustomMarkup.CryptoMenuMarkup(chatID, chatType))
             else:
-                dictForMU = {'A': 'a', 'B': 'b', 'C': 'c', 'D': 'df', 'E': 'df', 'F': 'df', 'G': 'gh', 'H': 'gh', 'I': 'ij', 'J': 'ij', 'K': 'kl', 'L': 'kl', 'M': 'm', 'N': 'nq', 'O': 'nq', 'P': 'nq', 'Q': 'nq', 'R': 'rs', 'S': 'rs', 'T': 'tu', 'U': 'tu', 'V': 'vy', 'W': 'vy', 'X': 'vy', 'Y': 'vy'}
+                dictForMU = {'A': 'a', 'B': 'b', 'C': 'c', 'D': 'df', 'E': 'df', 'F': 'df', 'G': 'gh', 'H': 'gh', 'I': 'ij', 'J': 'ij', 'K': 'kl', 'L': 'kl', 'M': 'm', 'N': 'nq', 'O': 'nq', 'P': 'nq', 'Q': 'nq', 'R': 'rs', 'S': 'rs', 'T': 'tu', 'U': 'tu', 'V': 'vz', 'W': 'vz', 'X': 'vz', 'Y': 'vz', 'Z': 'vz'}
                 await bot.edit_message_text(GetText(chatID, "letter_menu", chatType), chatID, call.message.message_id, reply_markup = CustomMarkup.CurrenciesSetupMarkup(chatID, chatType, dictForMU[Value[0]]))
 
     elif callData == "settings":

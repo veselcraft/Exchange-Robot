@@ -8,7 +8,7 @@
   <li>cchardet</li>
   <li>aiodns</li>
   <li>aiohttp[speedups]</li>
-  <li>Numberize 1.0.0</li>
+  <li>Numberize 1.0.1</li>
   <li>Requests 2.26.0</li>
 </ul>
 <b>ENGLISH VERSION</b><br>
