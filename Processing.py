@@ -13,7 +13,7 @@ _eng_chars = u"`qwertyuiop[]asdfghjkl;'zxcvbnm,.QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM,
 _rus_chars = u"ёйцукенгшщзхъфывапролджэячсмитьбюЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ"
 _ukr_chars = u"'йцукенгшщзхїфівапролджєячсмитьбюЙЦУКЕНГШЩЗХЇФІВАПРОЛДЖЄЯЧСМИТЬБЮ"
 
-def RemoveUsernames(MesTxt: str) -> str:
+def RemoveLinksAndWords(MesTxt: str) -> str:
     indexOfAtSign = -1
     indexOfSpace = -1
     while MesTxt.find("@") != -1:
@@ -23,6 +23,15 @@ def RemoveUsernames(MesTxt: str) -> str:
             MesTxt = MesTxt[0:indexOfAtSign] + MesTxt[indexOfSpace:]
         else:
             MesTxt = MesTxt[0:-1]
+
+    while MesTxt.find("http") != -1:
+        if MesTxt.find("@") != len(MesTxt) - 1:
+            indexOfAtSign = MesTxt.find("http")
+            indexOfSpace = MesTxt.find(" ", indexOfAtSign)
+            MesTxt = MesTxt[0:indexOfAtSign] + MesTxt[indexOfSpace:]
+        else:
+            MesTxt = MesTxt[0:-1]
+
     return MesTxt
 
 def SpecialSplit(MesTxt: str) -> list:
@@ -157,45 +166,6 @@ def LoadDictionaries():
         else:
             ListEqual[i] = [ListEqual[i]]
         ListEqual[i][len(ListEqual[i]) - 1] = ListEqual[i][len(ListEqual[i]) - 1].replace("\n", "")
-    for i in range(len(ListEqual)):
-        if ListEqual[i] == ['']:
-            pass
-        else:
-            for j in range(len(ListEqual[i])):
-                word = ListEqual[i][j]
-                if word[0] in _eng_chars:
-                    newRUword = ''
-                    newUAword = ''
-                    for k in range(len(word)):
-                        index = _eng_chars.find(word[k])
-                        newRUword += _rus_chars[index]
-                        newUAword += _ukr_chars[index]
-                    if newRUword not in ListEqual[i]:
-                        ListEqual[i].append(newRUword)
-                    if newUAword not in ListEqual[i]:
-                        ListEqual[i].append(newUAword)
-                elif word[0] in _rus_chars:
-                    newENword = ''
-                    newUAword = ''
-                    for k in range(len(word)):
-                        index = _rus_chars.find(word[k])
-                        newENword += _eng_chars[index]
-                        newUAword += _ukr_chars[index]
-                    if newENword not in ListEqual[i]:
-                        ListEqual[i].append(newENword)
-                    if newUAword not in ListEqual[i]:
-                        ListEqual[i].append(newUAword)
-                elif word[0] in _ukr_chars:
-                    newENword = ''
-                    newRUword = ''
-                    for k in range(len(word)):
-                        index = _ukr_chars.find(word[k])
-                        newENword += _eng_chars[index]
-                        newRUword += _rus_chars[index]
-                    if newENword not in ListEqual[i]:
-                        ListEqual[i].append(newENword)
-                    if newRUword not in ListEqual[i]:    
-                        ListEqual[i].append(newRUword)
 
     DicCryptoEntry = open("Dictionaries/CryptoEntry.txt", "r")
     ListCryptoEntry = DicCryptoEntry.readlines()

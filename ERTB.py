@@ -18,7 +18,7 @@ from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate 
 from BlackList import IsUserInBlackList, LoadBlackList
 import Processing
-from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit, RemoveUsernames
+from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit, RemoveLinksAndWords
 import TextHelper as CustomMarkup
 from TextHelper import LoadTexts, GetText
 import ListsCache
@@ -334,7 +334,7 @@ async def MainVoid(message: types.Message):
     # word to num
     OriginalMessageText = MessageText
     MessageText = MessageText.lower()
-    MessageText = RemoveUsernames(MessageText)
+    MessageText = RemoveLinksAndWords(MessageText)
     MessageText = w2n(MessageText, 'ru')
     MessageText = w2n(MessageText, 'uk')
     MessageText = w2n(MessageText, 'en')
