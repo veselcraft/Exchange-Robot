@@ -419,7 +419,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
                     CanUserDeleteMes = True
         if CanUserDeleteMes:
             try:
-                await bot.edit_message_text(call.message.text + "\n\n@" + str(fromUserId) + " (id: " + str(fromUserId) + ")" + " delete it.", chatID, call.message.message_id)
+                await bot.edit_message_text(call.message.text + "\n\n@" + str(call.from_user.username) + " (id: " + str(fromUserId) + ")" + " delete it.", chatID, call.message.message_id)
                 await call.message.delete()
             except:
                 Print("Cannot delete message.", "E")
