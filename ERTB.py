@@ -16,7 +16,7 @@ import DBH
 from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate 
-from BlackList import IsUserInBlackList, LoadBlackList
+from BlackList import IsUserInBlackList, LoadBlackList, RemoveFromBlackList
 import Processing
 from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit, RemoveLinksAndWords
 import TextHelper as CustomMarkup
@@ -56,45 +56,44 @@ async def HelpMes(message: types.Message):
     IsChatExist(chatID, chatType)
     await message.reply(GetText(chatID, "help", message.chat.type), reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
 
-def CanUserEditSettings(chatID: str, chatType: str, memberStatus: str, AllMembersAreAdministrators: bool = False) -> bool:
-    CanUserEditSettings = False
+def CanUserEditSettings(chatID: str, chatType: str, memberStatus: str, UserName: str, AllMembersAreAdministrators: bool = False) -> bool:
+    сanUserEditSettings = False
     AllChatSettings = DBH.GetAllSettings(chatID, chatType)
     if chatType == "private":
-        CanUserEditSettings = True
+        сanUserEditSettings = True
     else:
         whoCanEditSettings = AllChatSettings['editSettings']
         if whoCanEditSettings == "everybody":
-            CanUserEditSettings = True
+            сanUserEditSettings = True
         elif chatType == "group":
-            
             if AllMembersAreAdministrators == True and whoCanEditSettings == 'admins':
-                CanUserEditSettings = True
+                сanUserEditSettings = True
             elif AllMembersAreAdministrators == True and whoCanEditSettings == 'creator':
-                if memberStatus == 'creator':
-                    CanUserEditSettings = True
+                if memberStatus == 'creator' or UserName == "GroupAnonymousBot":
+                    сanUserEditSettings = True
             elif AllMembersAreAdministrators == False:
-                if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator") or whoCanEditSettings == 'creator' and memberStatus == "creator":
-                    CanUserEditSettings = True
+                if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator" or UserName == "GroupAnonymousBot") or whoCanEditSettings == 'creator' and (memberStatus == "creator" or UserName == "GroupAnonymousBot"):
+                    сanUserEditSettings = True
         elif chatType == "supergroup":
-            if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator") or whoCanEditSettings == 'creator' and memberStatus == "creator":
-                CanUserEditSettings = True
-    return CanUserEditSettings
+            if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator" or UserName == "GroupAnonymousBot") or whoCanEditSettings == 'creator' and (memberStatus == "creator" or UserName == "GroupAnonymousBot"):
+                сanUserEditSettings = True
+    return сanUserEditSettings
 
 @dp.message_handler(commands=['settings'])
 async def SettingsMes(message: types.Message):
     fromUserId = message.from_user.id
     chatID = message.chat.id
     chatType = message.chat.type
+    userName = message.from_user.username
     if IsUserInBlackList(fromUserId):
         return
     IsChatExist(chatID, chatType)
     
     member = await message.chat.get_member(fromUserId)
-    if CanUserEditSettings(chatID, chatType, member.status, message.chat.all_members_are_administrators):
+    if CanUserEditSettings(chatID, chatType, member.status, userName, message.chat.all_members_are_administrators):
         await message.reply(GetText(chatID, "main_settings_menu", chatType), reply_markup = CustomMarkup.SettingsMarkup(chatID, chatType))
     else:
         await message.reply(GetText(chatID, "error_main_settings_menu", chatType), reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
-
 
 @dp.message_handler(commands=['donate'])
 async def DonateMes(message: types.Message):
@@ -105,7 +104,6 @@ async def DonateMes(message: types.Message):
         return
     IsChatExist(chatID, message.chat.type)
     await message.reply(GetText(chatID, "donate", chatType), reply_markup = CustomMarkup.DonateMarkup(chatID, chatType))
-
 
 @dp.message_handler(commands=['wrong'])
 async def WrongMes(message: types.Message):
@@ -274,7 +272,7 @@ async def UnbanVoid(message: types.Message):
         unbanID = unbanID.replace("/unban ", "")
         if unbanID.isdigit():
             if DBH.IsBlacklisted(unbanID):
-                DBH.ClearBlacklist(unbanID)
+                RemoveFromBlackList(unbanID)
                 if not DBH.IsBlacklisted(unbanID):
                     await message.reply("Пользователь успешно разблокирован.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
                 else:
@@ -392,6 +390,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
     chatType = call.message.chat.type
     callData = call.data
     allAdmins = call.message.chat.all_members_are_administrators
+    userName = call.from_user.username
 
     if IsUserInBlackList(call.message.from_user.id):
         return
@@ -425,7 +424,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
                 Print("Cannot delete message.", "E")
     elif str(callData).find("delbut_") == 0:
         member = await call.message.chat.get_member(fromUserId)
-        if not CanUserEditSettings(chatID, chatType, member.status, allAdmins):
+        if not CanUserEditSettings(chatID, chatType, member.status, userName, allAdmins):
             return
         Index = str(callData).find("_") + 1
         Value = str(callData)[Index:len(str(callData))]
@@ -440,7 +439,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
     
     elif str(callData).find("lang_") == 0:
         member = await call.message.chat.get_member(fromUserId)
-        if not CanUserEditSettings(chatID, chatType, member.status, allAdmins):
+        if not CanUserEditSettings(chatID, chatType, member.status, userName, allAdmins):
             return
         Index = str(callData).find("_") + 1
         Value = str(callData)[Index:len(str(callData))]
@@ -452,7 +451,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
     
     elif str(callData).find("flags_") == 0:
         member = await call.message.chat.get_member(fromUserId)
-        if not CanUserEditSettings(chatID, chatType, member.status, allAdmins):
+        if not CanUserEditSettings(chatID, chatType, member.status, userName, allAdmins):
             return
         Index = str(callData).find("_") + 1
         Value = str(callData)[Index:len(str(callData))]
@@ -466,7 +465,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
     elif str(callData).find("edit_") == 0:
         member = await call.message.chat.get_member(fromUserId)
         memberStatus = member.status
-        if not CanUserEditSettings(chatID, chatType, memberStatus, allAdmins):
+        if not CanUserEditSettings(chatID, chatType, memberStatus, userName, allAdmins):
             return
         Index = str(callData).find("_") + 1
         Value = str(callData)[Index:len(str(callData))]
@@ -484,7 +483,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
     elif str(callData).find("cur_") == 0:
         member = await call.message.chat.get_member(fromUserId)
         memberStatus = member.status
-        if not CanUserEditSettings(chatID, chatType, memberStatus, allAdmins):
+        if not CanUserEditSettings(chatID, chatType, memberStatus, userName, allAdmins):
             return
         Index = str(callData).find("_") + 1
         Value = str(callData)[Index:len(str(callData))]
