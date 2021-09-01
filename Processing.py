@@ -342,21 +342,7 @@ def SearchValuesAndCurrencies(arr: list) -> list:
     while i < len(ListCryptoEntry):
         while j < len(ListCryptoEntry[i]):
             for u in range(len(arr)):
-                if u != len(arr) - 1 and (arr[u] + " " + arr[u + 1]).find(ListCryptoEntry[i][j]) == 0 and ListCryptoEntry[i] != ['']:
-                    if u <= len(arr) - 3 and u != 0:
-                        if arr[u + 2][0].isdigit():
-                            CryptoValues.append(arr[u + 2])
-                            CryptoNumber.append(i)
-                        elif arr[u - 1][0].isdigit():
-                            CryptoValues.append(arr[u - 1])
-                            CryptoNumber.append(i)
-                    elif u == len(arr) - 2 and arr[u - 1][0].isdigit():
-                        CryptoValues.append(arr[u - 1])
-                        CryptoNumber.append(i)
-                    elif u == 0 and arr[u + 2][0].isdigit():
-                        CryptoValues.append(arr[u + 2])
-                        CryptoNumber.append(i)
-                elif arr[u].find(ListCryptoEntry[i][j]) == 0 and ListCryptoEntry[i] != ['']:
+                if arr[u].find(ListCryptoEntry[i][j]) == 0 and ListCryptoEntry[i] != ['']:
                     if u != len(arr) - 1 and u != 0:
                         if arr[u + 1][0].isdigit():
                             CryptoValues.append(arr[u + 1])
