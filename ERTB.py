@@ -453,7 +453,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
     
     elif str(callData).find("flags_") == 0:
         member = await call.message.chat.get_member(fromUserId)
-        if not CanUserEditSettings(chatID, chatType, member.status, userName, allAdmins):
+        if not CanUserEditSettings(chatID, chatType, member.status, call.from_user.id, allAdmins):
             return
         Index = str(callData).find("_") + 1
         Value = str(callData)[Index:len(str(callData))]
