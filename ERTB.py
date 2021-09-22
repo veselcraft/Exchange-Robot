@@ -10,6 +10,7 @@ from threading import Thread
 import sys
 from datetime import datetime
 import time
+import os
 
 # Own libraries
 import DBH
@@ -71,13 +72,13 @@ def CanUserEditSettings(chatID: str, chatType: str, memberStatus: str, UserID: s
             if AllMembersAreAdministrators == True and whoCanEditSettings == 'admins':
                 сanUserEditSettings = True
             elif AllMembersAreAdministrators == True and whoCanEditSettings == 'creator':
-                if memberStatus == 'creator' or UserID == "1087968824":
+                if memberStatus == 'creator' or UserName == "GroupAnonymousBot":
                     сanUserEditSettings = True
             elif AllMembersAreAdministrators == False:
-                if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator" or UserID == "1087968824") or whoCanEditSettings == 'creator' and (memberStatus == "creator" or UserID == "1087968824"):
+                if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator" or UserName == "GroupAnonymousBot") or whoCanEditSettings == 'creator' and (memberStatus == "creator" or UserName == "GroupAnonymousBot"):
                     сanUserEditSettings = True
         elif chatType == "supergroup":
-            if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator" or UserID == "1087968824") or whoCanEditSettings == 'creator' and (memberStatus == "creator" or UserID == "1087968824"):
+            if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator" or UserName == "GroupAnonymousBot") or whoCanEditSettings == 'creator' and (memberStatus == "creator" or UserName == "GroupAnonymousBot"):
                 сanUserEditSettings = True
     return сanUserEditSettings
 
@@ -116,7 +117,10 @@ async def WrongMes(message: types.Message):
     if IsUserInBlackList(fromUserId):
         return
     IsChatExist(chatID, chatType)
-    MessageText = message.reply_to_message.text
+    try:
+        MessageText = message.reply_to_message.text
+    except:
+        Print("Wrong mes error", "E")
     if message.photo or message.video is not None or message.document is not None:
         MessageText = message.reply_to_message.caption
     DBH.AddReport(chatID, fromUserId, MessageText)
@@ -258,8 +262,15 @@ async def BackupVoid(message: types.Message):
         return
     if DBH.IsAdmin(fromUserId):
         nameOfBackup = DBH.CreateAllBackups()
-        backupFile = open(nameOfBackup, 'rb')
-        await bot.send_document(chatID, backupFile)
+        fileSize = os.path.getsize("Backups/" + nameOfBackup)
+        if fileSize <= 5242880:
+            try:
+                backupFile = open(nameOfBackup, 'rb')
+                await bot.send_document(chatID, backupFile)
+            except:
+                await message.reply("Не удалось отправить файл.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+        else:
+            await message.reply("Файл слишком велик. Его вес " + str(fileSize) + " Байт.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
 
 @dp.message_handler(commands=['unban'])
 async def UnbanVoid(message: types.Message):
