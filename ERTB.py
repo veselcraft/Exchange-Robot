@@ -262,7 +262,7 @@ async def BackupVoid(message: types.Message):
         return
     if DBH.IsAdmin(fromUserId):
         nameOfBackup = DBH.CreateAllBackups()
-        fileSize = os.path.getsize("Backups/" + nameOfBackup)
+        fileSize = os.path.getsize(nameOfBackup)
         if fileSize <= 5242880:
             try:
                 backupFile = open(nameOfBackup, 'rb')
