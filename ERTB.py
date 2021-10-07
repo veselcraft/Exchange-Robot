@@ -121,8 +121,8 @@ async def WrongMes(message: types.Message):
         MessageText = message.reply_to_message.text
     except:
         Print("Wrong mes error", "E")
-    if message.photo or message.video is not None or message.document is not None:
-        MessageText = message.reply_to_message.caption
+        if message.photo or message.video is not None or message.document is not None:
+            MessageText = message.reply_to_message.caption
     DBH.AddReport(chatID, fromUserId, MessageText)
 
 # Admin`s commands
@@ -285,7 +285,7 @@ async def UnbanVoid(message: types.Message):
         unbanID = unbanID.replace("/unban ", "")
         if unbanID.isdigit():
             if DBH.IsBlacklisted(unbanID):
-                RemoveFromBlackList(unbanID)
+                RemoveFromBlackList(int(unbanID))
                 if not DBH.IsBlacklisted(unbanID):
                     await message.reply("Пользователь успешно разблокирован.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
                 else:
