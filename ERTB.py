@@ -17,7 +17,7 @@ import DBH
 from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate 
-from BlackList import IsUserInBlackList, LoadBlackList, RemoveFromBlackList
+from BlackList import IsUserInBlackList, LoadBlackList, RemoveFromBlackList, AddToBlackList
 import Processing
 from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, SearchValuesAndCurrencies, SpecialSplit, TextToDigit, RemoveLinksAndWords
 import TextHelper as CustomMarkup
@@ -295,6 +295,29 @@ async def UnbanVoid(message: types.Message):
         else:
             await message.reply("В ID должны быть только цифры и минус.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
 
+@dp.message_handler(commands=['ban'])
+async def UnbanVoid(message: types.Message):
+    fromUserId = message.from_user.id
+    chatID = message.chat.id
+    chatType = message.chat.type
+
+    if IsUserInBlackList(fromUserId):
+        return
+    if DBH.IsAdmin(fromUserId):
+        banID = message.text
+        banID = banID.replace("/ban ", "")
+        if banID.isdigit():
+            if not DBH.IsBlacklisted(banID):
+                AddToBlackList(int(banID), chatID, chatID)
+                if DBH.IsBlacklisted(banID):
+                    await message.reply("Пользователь успешно заблокирован.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+                else:
+                    await message.reply("Не удалось заблокировать пользователя.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+            else:
+                await message.reply("Данный пользователь находится в ЧС. Блокировка не возможна.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+        else:
+            await message.reply("В ID должны быть только цифры и минус.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+
 # Technical commands
 @dp.message_handler(commands=['start'])
 async def StartVoid(message: types.Message):
@@ -317,7 +340,7 @@ async def MainVoid(message: types.Message):
         elif lang == "ru":
             return numberizerRU.replace_numerals(MesString)
         else:
-            return numberizerEN .replace_numerals(MesString)
+            return numberizerEN.replace_numerals(MesString)
 
     try:
         if message.forward_from.username == botUsername:

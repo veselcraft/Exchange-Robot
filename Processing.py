@@ -420,7 +420,7 @@ def TextToDigit(b: list) -> list:
         elif (b[i] == "кк" or b[i] == "kk" or "млн" in b[i]) and b[i - 1][0].isdigit(): #2.5кк = 2500000
             b[i - 1] = str(float(b[i - 1]) * 1000000)
             del b[i]
-        elif (b[i] == "ккк" or b[i] == "kkk") and b[i - 1][0].isdigit(): #2.5ккк = 2500000000
+        elif (b[i] == "ккк" or b[i] == "kkk" or "млрд" in b[i] or "миллиард" in b[i]) and b[i - 1][0].isdigit(): #2.5ккк = 2500000000
             b[i - 1] = str(float(b[i - 1]) * 1000000000)
             del b[i]
         i -= 1
@@ -514,8 +514,8 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
                 PartOfAnswer += "\n" + TwoZeroesToOne(str(Vault)) + " " + j
         answer += PartOfAnswer + "\n"
 
-    if isCryptoLink:
-        answer += "\n" + GetText(chatID, 'Crypto', chatType) + '<a href="https://accounts.binance.com/en/register?ref=GGMQ44GG">Binance</a>.'
+    #if isCryptoLink:
+    #    answer += "\n" + GetText(chatID, 'Crypto', chatType) + '<a href="https://accounts.binance.com/en/register?ref=GGMQ44GG">Binance</a>.'
 
     return answer
 
