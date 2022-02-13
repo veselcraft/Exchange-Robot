@@ -184,7 +184,9 @@ async def CountVoid(message: types.Message):
                 except:
                     Print("Chat " + str(i) + " not found.", "W")
                 time.sleep(0.035)
+                IsStartedCount = False
             if not isShortVariant:
+                IsStartedCount = True
                 listPC = DBH.GetPrivateChatIDs()
                 for i in listPC:
                     try:
