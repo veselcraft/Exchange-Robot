@@ -41,7 +41,7 @@ async def AboutMes(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
 
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     IsChatExist(chatID, chatType)
     await message.reply(GetText(chatID, "about", chatType), reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
@@ -52,7 +52,7 @@ async def HelpMes(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
 
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     IsChatExist(chatID, chatType)
     await message.reply(GetText(chatID, "help", message.chat.type), reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
@@ -88,7 +88,7 @@ async def SettingsMes(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
     userName = message.from_user.username
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     IsChatExist(chatID, chatType)
     
@@ -103,7 +103,7 @@ async def DonateMes(message: types.Message):
     fromUserId = message.from_user.id
     chatID = message.chat.id
     chatType = message.chat.type
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     IsChatExist(chatID, message.chat.type)
     await message.reply(GetText(chatID, "donate", chatType), reply_markup = CustomMarkup.DonateMarkup(chatID, chatType))
@@ -114,7 +114,7 @@ async def WrongMes(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
     
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     IsChatExist(chatID, chatType)
     try:
@@ -129,8 +129,9 @@ async def WrongMes(message: types.Message):
 @dp.message_handler(commands=['echo'])
 async def EchoVoid(message: types.Message):
     fromUserId = message.from_user.id
+    chatID = message.chat.id
 
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
         MessageToUsers = (message.text).replace("/echo ", "")
@@ -154,6 +155,25 @@ async def EchoVoid(message: types.Message):
         for i in adminList:
             await bot.send_message(i, "Рассылка закончена.", reply_markup = CustomMarkup.DeleteMarkup(i, "private"))
 
+@dp.message_handler(commands=['write'])
+async def EchoVoid(message: types.Message):
+    fromUserId = message.from_user.id
+    chatID = message.chat.id
+
+    if IsUserInBlackList(fromUserId, chatID):
+        return
+    if DBH.IsAdmin(fromUserId):
+        MessageToUsers = (message.text).replace("/echo ", "")
+        index = MessageToUsers.find(" ")
+        toChatID = MessageToUsers[0:index]
+        MessageToUsers = MessageToUsers.replace(chatID + " ", "")
+
+        try:
+            await bot.send_message(toChatID, MessageToUsers)
+            await bot.send_message(fromUserId, "Сообщение отправлено.")
+        except:
+            await bot.send_message(fromUserId, "Не удалось отправить сообщение.")
+
 @dp.message_handler(commands=['count'])  # Analog of "count".
 async def CountVoid(message: types.Message):
     fromUserId = message.from_user.id
@@ -161,7 +181,7 @@ async def CountVoid(message: types.Message):
     chatType = message.chat.type
 
     global IsStartedCount
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
         if not IsStartedCount:
@@ -209,7 +229,7 @@ async def AddAdminVoid(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
 
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
         newAdminID = message.text
@@ -233,7 +253,7 @@ async def StatsVoid(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
     
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
         chatStats = DBH.GetChatsAmount()
@@ -246,7 +266,7 @@ async def FullStatsVoid(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
 
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
         chatStats = DBH.GetTimeStats()
@@ -260,7 +280,7 @@ async def BackupVoid(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
     
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
         nameOfBackup = DBH.CreateAllBackups()
@@ -280,7 +300,7 @@ async def UnbanVoid(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
 
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
         unbanID = message.text
@@ -303,7 +323,7 @@ async def UnbanVoid(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
 
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
         banID = message.text
@@ -312,11 +332,11 @@ async def UnbanVoid(message: types.Message):
             if not DBH.IsBlacklisted(banID):
                 AddToBlackList(int(banID), chatID, chatID)
                 if DBH.IsBlacklisted(banID):
-                    await message.reply("Пользователь успешно заблокирован.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+                    await message.reply("Пользователь/чат успешно заблокирован.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
                 else:
-                    await message.reply("Не удалось заблокировать пользователя.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+                    await message.reply("Не удалось заблокировать пользователя/чат.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
             else:
-                await message.reply("Данный пользователь находится в ЧС. Блокировка не возможна.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
+                await message.reply("Данный пользователь/чат находится в ЧС. Блокировка не возможна.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
         else:
             await message.reply("В ID должны быть только цифры и минус.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
 
@@ -325,6 +345,9 @@ async def UnbanVoid(message: types.Message):
 async def StartVoid(message: types.Message):
     chatID = message.chat.id
     chatType = message.chat.type
+    fromUserId = message.from_user.id
+    if IsUserInBlackList(fromUserId, chatID):
+        return
 
     IsChatExist(chatID, chatType)
     if chatType == "private":
@@ -351,7 +374,7 @@ async def MainVoid(message: types.Message):
         pass
 
     # Checking if a user is on the blacklist
-    if IsUserInBlackList(fromUserId):
+    if IsUserInBlackList(fromUserId, chatID):
         return
 
     # Get message text
@@ -430,7 +453,7 @@ async def CallbackAnswer(call: types.CallbackQuery):
     allAdmins = call.message.chat.all_members_are_administrators
     userName = call.from_user.username
 
-    if IsUserInBlackList(call.message.from_user.id):
+    if IsUserInBlackList(call.message.from_user.id, chatID):
         return
     if callData == "delete":
         CanUserDeleteMes = False

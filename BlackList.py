@@ -2,9 +2,9 @@ import DBH
 
 BlackList = []
 
-def IsUserInBlackList(userID: str) -> bool:
+def IsUserInBlackList(userID: str, chatID: str) -> bool:
     global BlackList
-    if userID in BlackList:
+    if userID in BlackList or chatID in BlackList:
         return True
     else:
         return False
