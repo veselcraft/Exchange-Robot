@@ -163,16 +163,17 @@ async def EchoVoid(message: types.Message):
     if IsUserInBlackList(fromUserId, chatID):
         return
     if DBH.IsAdmin(fromUserId):
-        MessageToUsers = (message.text).replace("/echo ", "")
+        MessageToUsers = (message.text).replace("/write ", "")
         index = MessageToUsers.find(" ")
         toChatID = MessageToUsers[0:index]
-        MessageToUsers = MessageToUsers.replace(chatID + " ", "")
-
+        print(toChatID)
+        MessageToUsers = MessageToUsers.replace(str(chatID) + " ", "")
         try:
             await bot.send_message(toChatID, MessageToUsers)
             await bot.send_message(fromUserId, "Сообщение отправлено.")
         except:
             await bot.send_message(fromUserId, "Не удалось отправить сообщение.")
+       
 
 @dp.message_handler(commands=['count'])  # Analog of "count".
 async def CountVoid(message: types.Message):
@@ -236,7 +237,7 @@ async def AddAdminVoid(message: types.Message):
         newAdminID = newAdminID.replace("/newadmin ", "")
         if newAdminID.isdigit():
             if not DBH.IsAdmin(newAdminID):
-                DBH.AddAdmin(newAdminID)
+                DBH.AddAdmin(int(newAdminID))
                 ListOfAdmins = DBH.GetAdmins()
                 if newAdminID in ListOfAdmins:
                     await message.reply("Новый администратор успешно добавлен.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
@@ -328,7 +329,7 @@ async def UnbanVoid(message: types.Message):
     if DBH.IsAdmin(fromUserId):
         banID = message.text
         banID = banID.replace("/ban ", "")
-        if banID.isdigit():
+        if banID.isdigit() or (banID[1:].isdigit() and banID[0] == '-'):
             if not DBH.IsBlacklisted(banID):
                 AddToBlackList(int(banID), chatID, chatID)
                 if DBH.IsBlacklisted(banID):
