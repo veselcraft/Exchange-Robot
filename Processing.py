@@ -514,8 +514,8 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
                 PartOfAnswer += "\n" + TwoZeroesToOne(str(Vault)) + " " + j
         answer += PartOfAnswer + "\n"
 
-    #if isCryptoLink:
-    #    answer += "\n" + GetText(chatID, 'Crypto', chatType) + '<a href="https://accounts.binance.com/en/register?ref=GGMQ44GG">Binance</a>.'
+    if True:
+        answer += "\n" + GetText(chatID, 'Crypto', chatType)
 
     return answer
 
