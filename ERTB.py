@@ -440,10 +440,10 @@ async def MainVoid(message: types.Message):
         Print("Chat ID: " + str(message.chat.id) + " | Chat name: " + str(message.chat.title) + " | Chat username: "+str(message.chat.username) + " | Chat type: "+str(message.chat.type), "E")
         Print("Message: " + str(OriginalMessageText), "E")
     DBH.UpdateChatUsage(chatID)
-    #for i in NumArray[1]:
-        #DBH.ProcessedCurrency(chatID, fromUserId, ListsCache.GetListOfCur()[i], OriginalMessageText)
-    #for i in NumArray[3]:
-        #DBH.ProcessedCurrency(chatID, fromUserId, ListsCache.GetListOfCrypto()[i], OriginalMessageText)
+    for i in NumArray[1]:
+        DBH.ProcessedCurrency(chatID, fromUserId, ListsCache.GetListOfCur()[i], OriginalMessageText)
+    for i in NumArray[3]:
+        DBH.ProcessedCurrency(chatID, fromUserId, ListsCache.GetListOfCrypto()[i], OriginalMessageText)
 
 @dp.callback_query_handler(lambda call: True)
 async def CallbackAnswer(call: types.CallbackQuery):
