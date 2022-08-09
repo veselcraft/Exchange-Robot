@@ -307,9 +307,9 @@ async def UnbanVoid(message: types.Message):
         unbanID = message.text
         unbanID = unbanID.replace("/unban ", "")
         if unbanID.isdigit():
-            if DBH.IsBlacklisted(unbanID):
+            if DBH.IsBlacklisted(int(unbanID)):
                 RemoveFromBlackList(int(unbanID))
-                if not DBH.IsBlacklisted(unbanID):
+                if not DBH.IsBlacklisted(int(unbanID)):
                     await message.reply("Пользователь успешно разблокирован.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
                 else:
                     await message.reply("Не удалось разблокировать пользователя.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
@@ -330,9 +330,9 @@ async def UnbanVoid(message: types.Message):
         banID = message.text
         banID = banID.replace("/ban ", "")
         if banID.isdigit() or (banID[1:].isdigit() and banID[0] == '-'):
-            if not DBH.IsBlacklisted(banID):
+            if not DBH.IsBlacklisted(int(banID)):
                 AddToBlackList(int(banID), chatID, chatID)
-                if DBH.IsBlacklisted(banID):
+                if DBH.IsBlacklisted(int(banID)):
                     await message.reply("Пользователь/чат успешно заблокирован.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
                 else:
                     await message.reply("Не удалось заблокировать пользователя/чат.", reply_markup = CustomMarkup.DeleteMarkup(chatID, chatType))
