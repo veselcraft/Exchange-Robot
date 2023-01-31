@@ -44,6 +44,7 @@ By default, the bot is launched like this: <pre>python3 ERTB.py</pre> You can al
     <td><code>off</code></td>
   </tr>
 </table><br>
+
 ## List of commands for regular user
 <table>
   <tr>
@@ -71,6 +72,7 @@ By default, the bot is launched like this: <pre>python3 ERTB.py</pre> You can al
     <td>Reply the message is incorrectly recognized.</td>
   </tr>
 </table><br>
+
 ## List of commands in Telegram for developers/administrators
 <table>
   <tr>
@@ -106,6 +108,7 @@ By default, the bot is launched like this: <pre>python3 ERTB.py</pre> You can al
     <td>Unban user by ID. <code>/unban 123456789</code></td>
   </tr>
 </table>
+
 ## Requirements
 <ul>
   <li>Python 3.7+ (Recommended 3.8.10)</li>
