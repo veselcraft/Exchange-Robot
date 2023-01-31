@@ -1,4 +1,4 @@
-# exchange-rates-tg-bot
+# Exchange-Robot
 <b>Requirements:</b>
 <ul>
   <li>Python 3.7+ (Recommended 3.8.10)</li>
@@ -12,7 +12,7 @@
   <li>Requests 2.26.0</li>
 </ul>
 <b>ENGLISH VERSION</b><br>
-ERTB – exchange rates telegram bot.<br>
+Exchange-Robot – exchange rates telegram bot. Funny fork of original ERTB to hide political things :D<br>
 The bot recognizes currencies and amounts in the text, and then sends a message with other currencies. An example of a working bot: <a href="https://t.me/exchange_rates_vsk_bot">ERTB</a><br><br>
 <b>An example of how the bot works:</b><br>
 Your message:<br>

@@ -105,9 +105,9 @@ def LanguageMenuMarkup(chatID: str, chatType: str):
     AllSettings = DBH.GetAllSettings(chatID, chatType)
     dictLang = ButtonTexts[lang]
     LanguageMenuMU = InlineKeyboardMarkup()
-    LanguageMenuMU.add(InlineKeyboardButton("🇬🇧EN" + RulesMark('en', AllSettings), callback_data = "lang_en"))
-    LanguageMenuMU.add(InlineKeyboardButton("🏴‍☠️RU" + RulesMark('ru', AllSettings), callback_data = "lang_ru"))
-    LanguageMenuMU.add(InlineKeyboardButton("🇺🇦UA" + RulesMark('ua', AllSettings), callback_data = "lang_ua"))
+    LanguageMenuMU.add(InlineKeyboardButton("English" + RulesMark('en', AllSettings), callback_data = "lang_en"))
+    LanguageMenuMU.add(InlineKeyboardButton("Русский" + RulesMark('ru', AllSettings), callback_data = "lang_ru"))
+    LanguageMenuMU.add(InlineKeyboardButton("Українська" + RulesMark('ua', AllSettings), callback_data = "lang_ua"))
     LanguageMenuMU.add(InlineKeyboardButton(dictLang['back'], callback_data = "settings"))
     return LanguageMenuMU
 
